@@ -1,10 +1,10 @@
-# Flashcards for Reiner Pope on Dwarkesh Podcast — Practice Questions
+# Reiner Pope on the Dwarkesh Podcast
 
 - YouTube: https://youtu.be/xmkSf5IS-zw
 - Substack: https://www.dwarkesh.com/p/reiner-pope
 - Total cards: 27
 
-Wrote some practice problems to help myself and my audience retain Reiner's blackboard lecture.
+Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.
 
 ---
 
@@ -14,7 +14,7 @@ Wrote some practice problems to help myself and my audience retain Reiner's blac
 
 $$T = \max(t_{\text{compute}},\ t_{\text{mem}})$$
 
-### Q2. Equation for $t_{\text{compute}}$
+### Q2. Equation for $t_{\text{compute}}$ — not accounting for attention
 
 $$t_{\text{compute}} = \frac{B \cdot N_{\text{active}}}{\text{FLOPs}}$$
 

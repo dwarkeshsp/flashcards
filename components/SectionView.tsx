@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Section } from "@/lib/cards";
+import { Section } from "@/lib/types";
 import { QuestionRow } from "./QuestionRow";
 
 export function SectionView({
@@ -14,24 +14,37 @@ export function SectionView({
   section: Section;
   openIds: Set<string>;
   toggle: (id: string) => void;
-  episodeUrl: string;
+  episodeUrl?: string;
   headerExtra?: ReactNode;
 }) {
-  const youtubeTimestamp = sectionTimestampToYouTube(section.timestamp, episodeUrl);
+  const youtubeTimestamp =
+    section.timestamp && episodeUrl
+      ? sectionTimestampToYouTube(section.timestamp, episodeUrl)
+      : null;
 
   return (
     <section id={section.id} className="scroll-mt-6 pb-14">
       <div className="mb-3">
         <div className="flex items-baseline justify-between gap-3">
-          <a
-            href={youtubeTimestamp}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="font-mono text-[0.78rem] tabular-nums text-ink-faint transition-colors hover:text-accent"
-            title="Jump to this section on YouTube"
-          >
-            {section.timestamp}
-          </a>
+          {section.timestamp ? (
+            youtubeTimestamp ? (
+              <a
+                href={youtubeTimestamp}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="font-mono text-[0.78rem] tabular-nums text-ink-faint transition-colors hover:text-accent"
+                title="Jump to this section on YouTube"
+              >
+                {section.timestamp}
+              </a>
+            ) : (
+              <span className="font-mono text-[0.78rem] tabular-nums text-ink-faint">
+                {section.timestamp}
+              </span>
+            )
+          ) : (
+            <span />
+          )}
           {headerExtra}
         </div>
         <h2 className="mt-1 font-serif text-[1.55rem] font-medium leading-tight tracking-tight text-ink">
@@ -41,15 +54,7 @@ export function SectionView({
 
       {section.cards.length === 0 ? (
         <p className="text-[0.95rem] italic text-ink-muted">
-          No flashcards for this section yet — see the{" "}
-          <a
-            href="/exports/transcript.md"
-            className="not-italic underline decoration-rule hover:decoration-accent"
-            download
-          >
-            transcript
-          </a>
-          .
+          No flashcards for this section yet.
         </p>
       ) : (
         <ul className="border-y border-rule">

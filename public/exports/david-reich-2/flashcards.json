@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "slug": "david-reich-2",
+    "title": "David Reich on the Dwarkesh Podcast (Part 2)",
+    "guest": "David Reich",
+    "blurb": "Practice questions for David Reich's second appearance on natural selection in recent human evolution and the new Akbari et al. study of ~500 loci under selection in the last 10,000 years.",
+    "date": null,
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "fundamentals",
+      "timestamp": null,
+      "title": "Population genetics fundamentals",
+      "cards": [
+        {
+          "question_md": "What concretely is the selection coefficient of an allele?",
+          "answer_md": "How many more surviving offspring, in expectation, carriers of the allele will have.\n\nE.g. a selection coefficient $s = 0.01$ means $1\\%$ more surviving offspring than non-carriers.",
+          "question_html": "What concretely is the selection coefficient of an allele?",
+          "answer_html": "How many more surviving offspring, in expectation, carriers of the allele will have.\n\nE.g. a selection coefficient \\(s = 0.01\\) means \\(1\\%\\) more surviving offspring than non-carriers."
+        },
+        {
+          "question_md": "Expected heterozygosity scales as what? (constant + two variables)",
+          "answer_md": "$$H \\propto 4 \\cdot N_e \\cdot \\mu$$\n\nwhere $N_e$ is the effective population size and $\\mu$ is the mutation rate.",
+          "question_html": "Expected heterozygosity scales as what? (constant + two variables)",
+          "answer_html": "\\[H \\propto 4 \\cdot N_e \\cdot \\mu\\]\n\nwhere \\(N_e\\) is the effective population size and \\(\\mu\\) is the mutation rate."
+        },
+        {
+          "question_md": "What is effective population size, and why is it so much smaller than census population size?",
+          "answer_md": "The size of an idealized population that would experience the same rate of genetic drift as the real population.\n\nIt's smaller than census size because of previous bottlenecks and unevenness in reproduction (not everyone reproduces equally).",
+          "question_html": "What is effective population size, and why is it so much smaller than census population size?",
+          "answer_html": "The size of an idealized population that would experience the same rate of genetic drift as the real population.\n\nIt's smaller than census size because of previous bottlenecks and unevenness in reproduction (not everyone reproduces equally)."
+        },
+        {
+          "question_md": "What is background selection?",
+          "answer_md": "The steady purging of deleterious alleles near functional regions, which also drags along any neutral variation that sits on the same haplotype background.",
+          "question_html": "What is background selection?",
+          "answer_html": "The steady purging of deleterious alleles near functional regions, which also drags along any neutral variation that sits on the same haplotype background."
+        }
+      ]
+    },
+    {
+      "id": "selection-dynamics",
+      "timestamp": null,
+      "title": "Selection dynamics in populations",
+      "cards": [
+        {
+          "question_md": "Why does it only take twice as long for a favorable allele to reach fixation in a population of 100 million as compared to a population of 10,000?",
+          "answer_md": "The frequency of an advantageous allele grows exponentially over time (like the flu), so the time to fixation scales with the logarithm of population size — not linearly.",
+          "question_html": "Why does it only take twice as long for a favorable allele to reach fixation in a population of 100 million as compared to a population of 10,000?",
+          "answer_html": "The frequency of an advantageous allele grows exponentially over time (like the flu), so the time to fixation scales with the logarithm of population size — not linearly."
+        },
+        {
+          "question_md": "Why do even neutral alleles get caught up in background selection? Why does the local level of drift go up?",
+          "answer_md": "When a deleterious allele is eliminated, it takes along everything else on the same chromosome that's linked to it — including neutral variants nearby. That linked hitchhiking effectively reduces $N_e$ locally, which looks like extra drift.",
+          "question_html": "Why do even neutral alleles get caught up in background selection? Why does the local level of drift go up?",
+          "answer_html": "When a deleterious allele is eliminated, it takes along everything else on the same chromosome that's linked to it — including neutral variants nearby. That linked hitchhiking effectively reduces \\(N_e\\) locally, which looks like extra drift."
+        },
+        {
+          "question_md": "What are two reasons that selective sweeps on specific loci might be rare despite the fact that selection for traits has continued?",
+          "answer_md": "1. Traits are so polygenic that any individual locus is effectively neutral.\n2. The direction of selection changes so quickly that no single locus gets sustained enough pressure for a sweep to get traction.",
+          "question_html": "What are two reasons that selective sweeps on specific loci might be rare despite the fact that selection for traits has continued?",
+          "answer_html": "1. Traits are so polygenic that any individual locus is effectively neutral.\n2. The direction of selection changes so quickly that no single locus gets sustained enough pressure for a sweep to get traction."
+        }
+      ]
+    },
+    {
+      "id": "detecting-selection",
+      "timestamp": null,
+      "title": "Detecting selection — classical methods",
+      "cards": [
+        {
+          "question_md": "Describe how the amount of selection on a locus can be identified by looking at diversity around it.",
+          "answer_md": "Selection shows up as unusually **low** diversity near a functional gene — neutral variants nearby get carried along (or purged) via linkage, reducing local heterozygosity.",
+          "question_html": "Describe how the amount of selection on a locus can be identified by looking at diversity around it.",
+          "answer_html": "Selection shows up as unusually <b>low</b> diversity near a functional gene — neutral variants nearby get carried along (or purged) via linkage, reducing local heterozygosity."
+        },
+        {
+          "question_md": "Describe how selection on a locus can be identified through differences between diverged populations.",
+          "answer_md": "The allele frequency of the variant is much more different between diverged populations than drift alone would imply.",
+          "question_html": "Describe how selection on a locus can be identified through differences between diverged populations.",
+          "answer_html": "The allele frequency of the variant is much more different between diverged populations than drift alone would imply."
+        },
+        {
+          "question_md": "Explain the methodology of Bhatia et al. 2014 to find selection effects of American slavery.",
+          "answer_md": "- African Americans are $\\sim 20\\%$ European and $\\sim 80\\%$ West African (using the Yoruba population as a proxy for pre-admixture West African ancestry).\n- If a site has been under selection since admixture, the allele frequency in modern African Americans should deviate from the frequency predicted by that $20/80$ mixture.\n- They ran this scan on $29{,}141$ African Americans.",
+          "question_html": "Explain the methodology of Bhatia et al. 2014 to find selection effects of American slavery.",
+          "answer_html": "• African Americans are \\(\\sim 20\\%\\) European and \\(\\sim 80\\%\\) West African (using the Yoruba population as a proxy for pre-admixture West African ancestry).\n• If a site has been under selection since admixture, the allele frequency in modern African Americans should deviate from the frequency predicted by that \\(20/80\\) mixture.\n• They ran this scan on \\(29{,}141\\) African Americans."
+        },
+        {
+          "question_md": "What technique was used before Reich & Akbari to ask whether allele frequency changes over time resulted from selection vs. drift?",
+          "answer_md": "The admixture-residual method: model later populations as linear mixtures of earlier ones, then flag any allele whose frequency deviates more from the mixture prediction than drift alone would allow.",
+          "question_html": "What technique was used before Reich & Akbari to ask whether allele frequency changes over time resulted from selection vs. drift?",
+          "answer_html": "The admixture-residual method: model later populations as linear mixtures of earlier ones, then flag any allele whose frequency deviates more from the mixture prediction than drift alone would allow."
+        },
+        {
+          "question_md": "What problem does the admixture-residual method have for figuring out selection vs. drift over the last 10,000 years (pre Reich/Akbari)?",
+          "answer_md": "Its drift-based null distribution is set by the *entire* divergence history — tens of thousands of years, including eras when groups had very small effective population sizes and therefore lots of drift. That inflated null makes it hard to detect real selection over the last 10,000 years specifically.",
+          "question_html": "What problem does the admixture-residual method have for figuring out selection vs. drift over the last 10,000 years (pre Reich/Akbari)?",
+          "answer_html": "Its drift-based null distribution is set by the <i>entire</i> divergence history — tens of thousands of years, including eras when groups had very small effective population sizes and therefore lots of drift. That inflated null makes it hard to detect real selection over the last 10,000 years specifically."
+        }
+      ]
+    },
+    {
+      "id": "reich-akbari-paper",
+      "timestamp": null,
+      "title": "The Reich & Akbari paper",
+      "cards": [
+        {
+          "question_md": "The new Reich paper found ~500 significant loci under selection in the last 10,000 years. What are two ways to reconcile this with the previous finding that there are almost no fixed differences between populations?",
+          "answer_md": "1. **Selection has accelerated recently** (due to agriculture, new environments, etc.) — velocity is high, but there hasn't been enough time to drive any allele all the way to fixation.\n2. **Selection fluctuates.** Instead of driving an allele to fixation, the direction can reverse, so allele frequencies oscillate rather than getting pinned at 0 or 1.",
+          "question_html": "The new Reich paper found ~500 significant loci under selection in the last 10,000 years. What are two ways to reconcile this with the previous finding that there are almost no fixed differences between populations?",
+          "answer_html": "1. <b>Selection has accelerated recently</b> (due to agriculture, new environments, etc.) — velocity is high, but there hasn't been enough time to drive any allele all the way to fixation.\n2. <b>Selection fluctuates.</b> Instead of driving an allele to fixation, the direction can reverse, so allele frequencies oscillate rather than getting pinned at 0 or 1."
+        }
+      ]
+    }
+  ]
+}

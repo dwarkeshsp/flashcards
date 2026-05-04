@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Reiner Pope on Dwarkesh Podcast — Practice Questions",
+  title: "Dwarkesh Podcast Flashcards",
   description:
-    "Flashcards covering the math and intuition from Reiner Pope's blackboard lecture on the Dwarkesh Podcast: transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.",
+    "Practice questions for technical episodes of the Dwarkesh Podcast. One deck per guest — click-to-reveal online or download as Anki / Markdown.",
   openGraph: {
-    title: "Reiner Pope on Dwarkesh Podcast — Practice Questions",
+    title: "Dwarkesh Podcast Flashcards",
     description:
-      "Flashcards covering the math and intuition from Reiner Pope's blackboard lecture on the Dwarkesh Podcast.",
+      "Practice questions for technical episodes of the Dwarkesh Podcast.",
     type: "website",
   },
 };

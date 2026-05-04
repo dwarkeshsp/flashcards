@@ -1,11 +1,11 @@
 ## Timestamps
 
-(00:00:00) – How batch size affects token cost and speed  
-(00:32:09) – How MoE models are laid out across GPU racks  
-(00:47:12) – How pipeline parallelism moves model layers across racks  
-(01:03:37) – Why Ilya said, “As we now know, pipelining is not wise.”  
-(01:18:59) – Because of RL, models may be 100x over-trained beyond Chinchilla-optimal  
-(01:33:02) – Deducing long context memory costs from API pricing  
+(00:00:00) – How batch size affects token cost and speed
+(00:32:09) – How MoE models are laid out across GPU racks
+(00:47:12) – How pipeline parallelism moves model layers across racks
+(01:03:37) – Why Ilya said, “As we now know, pipelining is not wise.”
+(01:18:59) – Because of RL, models may be 100x over-trained beyond Chinchilla-optimal
+(01:33:02) – Deducing long context memory costs from API pricing
 (02:04:02) – Convergent evolution between neural nets and cryptography
 
 ## Transcript
@@ -150,7 +150,7 @@ Has that ratio changed over time as we've gone from model generation to model ge
 
 **Reiner Pope**
 
-This is a hardware parameter. To what extent has the hardware changed? From [A100](https://www.nvidia.com/en-us/data-center/a100/) to [H100](https://www.nvidia.com/en-us/data-center/h100/) to [B100](https://www.exxactcorp.com/blog/hpc/comparing-nvidia-tensor-core-gpus), the FLOPs have increased substantially, the memory bandwidth has also increased substantially, and it has remained reasonably stable. 
+This is a hardware parameter. To what extent has the hardware changed? From [A100](https://www.nvidia.com/en-us/data-center/a100/) to [H100](https://www.nvidia.com/en-us/data-center/h100/) to [B100](https://www.exxactcorp.com/blog/hpc/comparing-nvidia-tensor-core-gpus), the FLOPs have increased substantially, the memory bandwidth has also increased substantially, and it has remained reasonably stable.
 
 We can express this one as well. This is a sparsity parameter. I might even phrase this slightly differently. Let's solve for batch size in total. Moving this back over to the other side, we end up with batch size needs to be bigger than approximately 300 times sparsity. For example, in DeepSeek I activate 32 out of 256 experts, so this would be 8 for DeepSeek.
 
@@ -230,7 +230,7 @@ That's a very interesting result. One question is how much of a push towards cen
 
 **Reiner Pope**
 
-We can do a bit of analysis on this. You can think of it in terms of number of users, but a more productive way to think of it is in terms of tokens per second. What does this batch size mean in terms of tokens per second of the system? 
+We can do a bit of analysis on this. You can think of it in terms of number of users, but a more productive way to think of it is in terms of tokens per second. What does this batch size mean in terms of tokens per second of the system?
 
 Tokens per second is going to be equal to the batch size. We run a batch of tokens, and we do that every time interval, which is equal to the 15-millisecond or 20-millisecond number. This ends up being batch size times about 60, so 64 x *B*. This ends up being around 2,000 x 64, so 128,000 tokens per second. This is in more digestible units.
 
@@ -594,7 +594,7 @@ Even in inference, in fact, it is not used a ton. It reduces your memory capacit
 
 But it does say that theoretically, maybe you had too much memory there. You could have built different hardware that has less memory. If you were designing your hardware, you could say, "I didn't need that much memory because I don't need the weights to fit in one rack. I can fit the weights in eight racks, then I could have built hardware that didn't have so much HBM per GPU."
 
-### 01:03:37 – Why Ilya said, “As we now know, pipelining is not wise.” 
+### 01:03:37 – Why Ilya said, “As we now know, pipelining is not wise.”
 
 **Dwarkesh Patel**
 
@@ -632,7 +632,7 @@ Yeah, for example.
 
 This is the place where we actually need to go back and analyze this batch size *B*. You were making this comment that there's micro-batching versus global batching. Let's come back to this pipelining diagram here.
 
-We've got one batch going forward here, and then as I drew it, it kind of just disappeared. That's not really correct. If you think about how decode is working, I have a bunch of tokens that I have generated already. I do one forwards pass where I generate a new token, and then I write that to my KV cache. Then I do another forwards pass that generates the next token. I'm actually going to be running this batch zero in a loop. In fact, I go forwards. Once I finish, I can start the next iteration of the loop up here. We'll just fill this in. We've got the two, three, two and three, and two and three. 
+We've got one batch going forward here, and then as I drew it, it kind of just disappeared. That's not really correct. If you think about how decode is working, I have a bunch of tokens that I have generated already. I do one forwards pass where I generate a new token, and then I write that to my KV cache. Then I do another forwards pass that generates the next token. I'm actually going to be running this batch zero in a loop. In fact, I go forwards. Once I finish, I can start the next iteration of the loop up here. We'll just fill this in. We've got the two, three, two and three, and two and three.
 
 Let's split this batch. This batch will be the global batch size. *B* is going to be the number of micro-batches times the batch size per micro-batch. How many micro-batches do we need? The number of micro-batches in this diagram is 4: zero, one, two, three. The micro-batch size is still this 2000-ish number. Sorry, no, this is the 300 times sparsity.
 
@@ -642,7 +642,7 @@ This is how big the train that takes off every 20 milliseconds is.
 
 **Reiner Pope**
 
-Right. This is going to be the 20-millisecond train. The global batch size is the number of micro-batches times the local batch size. Local batch size is set by this hardware parameter. 
+Right. This is going to be the 20-millisecond train. The global batch size is the number of micro-batches times the local batch size. Local batch size is set by this hardware parameter.
 
 The number of micro-batches is as small as possible, such that we can wrap around and not leave any idle time. If we had fewer, we would have this idle time when we wrap around. You can visually see that it is equal to the number of pipeline stages. It's a proof by visual here. It is 4, and it's 4 this way as well. You can look and see that it goes along here, and then it wraps around to the number of pipeline stages.
 
@@ -652,7 +652,7 @@ Sorry, very basic question. Is this what is actually done? A frontier model toda
 
 **Reiner Pope**
 
-For sure during massive scale training this is done. It can be done for inference. I'm actually going to make the case for why it is less attractive. It is useful for weights, but not so useful for KVs. 
+For sure during massive scale training this is done. It can be done for inference. I'm actually going to make the case for why it is less attractive. It is useful for weights, but not so useful for KVs.
 
 The big challenge is... Let's fill this in. The micro-batch size here ends up being equal to the number of pipeline stages. When we go back and substitute all of that into here, we get a number of pipeline stages times this little *b* showing up in here. When we factor this out, I'm going to split this plus into two terms.
 
@@ -710,7 +710,7 @@ Let me make sure I understand the claim. The claim would not be you could have t
 
 **Reiner Pope**
 
-Actually, pipelining doesn't help with context length. It totally helps with model size. Because of the ability to do pipelining, a rack at least should not be a constraint on your ability to fit the model parameters. 
+Actually, pipelining doesn't help with context length. It totally helps with model size. Because of the ability to do pipelining, a rack at least should not be a constraint on your ability to fit the model parameters.
 
 The other consideration you're asking is, why hasn't it scaled up more, and why did bigger scale-up domains help? We talked through one aspect of that, which is that it's not because of memory capacity. We have a solution to the memory capacity at least with respect to model size, not with respect to KV cache size but at least with respect to model size. The other issue that shows up is latency.
 
@@ -766,7 +766,7 @@ It may in fact go up to a data center switch and back. It depends on deployment 
 
 **Dwarkesh Patel**
 
-Got it. And because it's decode and sequential, they stack up across the stages. You can't do them at the same time. 
+Got it. And because it's decode and sequential, they stack up across the stages. You can't do them at the same time.
 
 **Reiner Pope**
 
@@ -864,7 +864,7 @@ I'm not sure I understand the intuition for that. Another naive model could have
 
 **Reiner Pope**
 
-That's also a valid answer. Because this is heuristic, I can't really argue for one versus the other. They don't differ by that much. Thirty-three versus twenty-five is only a small factor off. 
+That's also a valid answer. Because this is heuristic, I can't really argue for one versus the other. They don't differ by that much. Thirty-three versus twenty-five is only a small factor off.
 
 Let's pick one of them. All equal seems simple enough, so we're just going to solve for equality of them. It's pretty straightforward. We can immediately see that the number of activated parameters totally disappears, so let's factor that out. We're going to just say that data in pre-training—I decided to do it your way, it's a little bit nicer—plus... Oh, I didn't have the inefficiency over here either. Data in pre-training plus some multiple of α times the data in RL is going to end up equal to some β times the data in inference.
 
@@ -876,9 +876,9 @@ If both of them are one in ten, that kind of implies that there's never a backwa
 
 **Reiner Pope**
 
-Yeah. Okay, we can make this 2/10. Make it a bit bigger. Just write it out once more, this is 2/10, this is 1/10. 
+Yeah. Okay, we can make this 2/10. Make it a bit bigger. Just write it out once more, this is 2/10, this is 1/10.
 
-The number of inference tokens you have is just a function of hundreds of millions of tokens per second times my model is deployed for two months before I ship to the next version. That should determine the number of tokens in RL and pre-training. 
+The number of inference tokens you have is just a function of hundreds of millions of tokens per second times my model is deployed for two months before I ship to the next version. That should determine the number of tokens in RL and pre-training.
 
 I guess we didn't do the equivalence between pre-training and RL, so we'll do that here. Data in pre-training should be equal to 2/10 data in RL for them to be cost equivalent. Sorry, 1/10. I got it backwards. We pay more cost when it's inefficient, so this needs to be 1/10. Tracing this back… This thing ends up actually being, as written here… This is like 1.5, and this is one.
 
@@ -888,7 +888,7 @@ Billions of dollars worth of compute just flowed in the other direction.
 
 **Reiner Pope**
 
-Right? I think if you do it with a spreadsheet and actually model it out, you might notice when the money’s going down the drain. All of these end up being close in, as modeled here. This 30% may have been a little bit too generous. So let's say something like 1.5 here, and leave this as a one here. 
+Right? I think if you do it with a spreadsheet and actually model it out, you might notice when the money’s going down the drain. All of these end up being close in, as modeled here. This 30% may have been a little bit too generous. So let's say something like 1.5 here, and leave this as a one here.
 
 I think at this point, you can almost read it off. The number of inference tokens should be about the same as the number of pre-training tokens, which should be about the same as the number of RL tokens, within factors that we're not able to reason about.
 
@@ -996,7 +996,7 @@ This is why you should just approximate everywhere, because there are big error 
 
 **Dwarkesh Patel**
 
-That's super cool. Okay, so in the spirit of trying to deduce things, we can publicly look up the API prices of these models, and maybe we can learn something from that. 
+That's super cool. Okay, so in the spirit of trying to deduce things, we can publicly look up the API prices of these models, and maybe we can learn something from that.
 
 First, with longer context, [Gemini 3.1](https://ai.google.dev/gemini-api/docs/pricing) is 50% more expensive if you go over 200k tokens than if you're below 200k tokens. At a high level, I understand why that might be, but why specifically 50%?
 
@@ -1010,11 +1010,11 @@ Then we'll also draw the dependence of the memory fetch on context length. This 
 
 So this is the cost that Gemini might be paying. And then you think, how might you put a pricing structure on top of that? You would like to ensure that no matter what the context length is, you are still profitable. So we've got a two-tier pricing structure. Maybe we've got something that looks like this up to some extent.
 
-I think it says something about, given that the bump is at 200k, it probably means that this is somewhat aligned with this crossover point. Maybe not exactly aligned with it. We can actually probably even complete that calculation just to see where it lands out. 
+I think it says something about, given that the bump is at 200k, it probably means that this is somewhat aligned with this crossover point. Maybe not exactly aligned with it. We can actually probably even complete that calculation just to see where it lands out.
 
 We can solve for the number of bytes per token if we make some assumptions about the number of active parameters. So solving for the number of bytes per token, we're going to assume the point where we equalize the time of memory and the time of compute is at, let's say, 200k tokens. So we equalize these two.
 
-We're also going to assume that the batch size is large enough that the memory time spent on weights is negligible. So we'll forget about this, and we'll focus on the actual memory time spent on KV cache. That ends up saying, copying this term over, batch times length of context times bytes per token over memory bandwidth is going to be equal to the number of activated params over FLOPs. And then we're going to solve for bytes per token. Batch size was missing here. It shows up here, and then it cancels out by the time we get to here. And I dropped the length of context. 
+We're also going to assume that the batch size is large enough that the memory time spent on weights is negligible. So we'll forget about this, and we'll focus on the actual memory time spent on KV cache. That ends up saying, copying this term over, batch times length of context times bytes per token over memory bandwidth is going to be equal to the number of activated params over FLOPs. And then we're going to solve for bytes per token. Batch size was missing here. It shows up here, and then it cancels out by the time we get to here. And I dropped the length of context.
 
 So we can plug in numbers. This is the reciprocal of the number that we saw before. This is 1/300, which is reasonably stable across many different hardware platforms. We conjecturally said that maybe the number of activated parameters is a hundred billion. The length of the context we said was 200k. Something is wrong here, though. Length of the context should be on the denominator, not the numerator.
 
@@ -1024,7 +1024,7 @@ So we can plug in numbers. This is the reciprocal of the number that we saw befo
 
 **Reiner Pope**
 
-That is plausible, actually. You said around two kilobytes. Let's just do a sanity check for what this could be. There are two mechanisms that people do attention with a small number of bytes per token. One is dense attention with a lot of reuse across layers. [Character AI](https://en.wikipedia.org/wiki/Character.ai) has [a blog post talking about that, alternating long and short context](https://blog.character.ai/optimizing-ai-inference-at-character-ai-2/). In the Character AI kind of model, which also showed up in the [Gemma](https://en.wikipedia.org/wiki/Gemma_\(language_model\)) models, the global context—which is really what we're talking about here—was shared across all the layers. 
+That is plausible, actually. You said around two kilobytes. Let's just do a sanity check for what this could be. There are two mechanisms that people do attention with a small number of bytes per token. One is dense attention with a lot of reuse across layers. [Character AI](https://en.wikipedia.org/wiki/Character.ai) has [a blog post talking about that, alternating long and short context](https://blog.character.ai/optimizing-ai-inference-at-character-ai-2/). In the Character AI kind of model, which also showed up in the [Gemma](https://en.wikipedia.org/wiki/Gemma_\(language_model\)) models, the global context—which is really what we're talking about here—was shared across all the layers.
 
 To get this to kilobytes, you could get that, for example, as a *d*head of 128, which is typical. Then the number of bytes is typically the number of attention layers times two times *d*head times the number of KV heads. This is the number of unique contexts per layer.
 
@@ -1178,9 +1178,9 @@ That's decode.
 
 **Dwarkesh Patel**
 
-Decode. Right. Now *t*mem, we have this whole thing divided by len-pass. Well, it doesn't really matter what's up there, it'll just be something that looks like this. Let's say this is *t*mem. This is decode again. 
+Decode. Right. Now *t*mem, we have this whole thing divided by len-pass. Well, it doesn't really matter what's up there, it'll just be something that looks like this. Let's say this is *t*mem. This is decode again.
 
-So as the length of the prefix goes up, or pass, your memory bandwidth time declines, and that means that to the extent that you were bottlenecked on memory bandwidth before, you can avoid being bottlenecked on memory bandwidth. 
+So as the length of the prefix goes up, or pass, your memory bandwidth time declines, and that means that to the extent that you were bottlenecked on memory bandwidth before, you can avoid being bottlenecked on memory bandwidth.
 
 The fact that they are charging 5x less for prefill than decode does suggest that they are bottlenecked on memory bandwidth to quite a degree, such that for them at least—because *t* is equivalent to cost, it's the cost of renting a compute—this would be at 1, and this would be at 5\.
 
@@ -1206,9 +1206,9 @@ Another interesting one would be why cache hits are so much cheaper. If I rememb
 
 Right. There are two ways you can produce the KV cache for a token. You can just produce it from scratch by computing it from the underlying token IDs, which are tiny. Or you can previously have produced it and stored it in a memory somewhere.
 
-The cost ratio is really talking about the ratio between those two mechanisms of producing it. A cache miss means you've deleted it from all your memories, and you have to recompute it from the tokens directly. You can even take that a step further and think about which memory tier you store it in. You could store it in HBM. There are other slower and cheaper memories than HBM, like [DDR](https://en.wikipedia.org/wiki/DDR_SDRAM) on your host or [flash](https://en.wikipedia.org/wiki/Flash_memory) as well. One of the things you can do is a calculation of where it makes sense to be in each memory tier, and this is related to how long you're going to store it for. 
+The cost ratio is really talking about the ratio between those two mechanisms of producing it. A cache miss means you've deleted it from all your memories, and you have to recompute it from the tokens directly. You can even take that a step further and think about which memory tier you store it in. You could store it in HBM. There are other slower and cheaper memories than HBM, like [DDR](https://en.wikipedia.org/wiki/DDR_SDRAM) on your host or [flash](https://en.wikipedia.org/wiki/Flash_memory) as well. One of the things you can do is a calculation of where it makes sense to be in each memory tier, and this is related to how long you're going to store it for.
 
-We want to look at the cost of storage in a few different memory tiers and also the cost of rematerialization. Remat means the cost to rebuild all of the KV cache from scratch after you deleted it, so we rematerialize it. Basically, this is going to cost the length of the context. Actually, we'll look at the cost per token, so we don't need to carry around this length of context everywhere. 
+We want to look at the cost of storage in a few different memory tiers and also the cost of rematerialization. Remat means the cost to rebuild all of the KV cache from scratch after you deleted it, so we rematerialize it. Basically, this is going to cost the length of the context. Actually, we'll look at the cost per token, so we don't need to carry around this length of context everywhere.
 
 To rematerialize one token of KV cache, I just need to run a forward pass on the whole model. This is going to be the compute time. I have to rerun the compute at whatever speed my GPU does it, and then I multiply it by my GPU dollars per second.
 
@@ -1258,7 +1258,7 @@ And why doesn't sparse attention solve it?
 
 **Reiner Pope**
 
-Sparse attention is a big improvement. Maybe that is priced in already, perhaps. It's not an infinite improvement because if you go too sparse, you lose too much quality. 
+Sparse attention is a big improvement. Maybe that is priced in already, perhaps. It's not an infinite improvement because if you go too sparse, you lose too much quality.
 
 The empirical result is that the context lengths haven't been increasing that much. I think it's because there is no solution to the memory wall here. Going too sparse just means you're attending to a very small subset of the tokens, and the quality will get worse.
 
@@ -1326,7 +1326,7 @@ That's $5 to “retrieve”. And then to write, presumably HBM, for five minutes
 
 **Reiner Pope**
 
-We might be able to determine which memory tier it is by the durations. 
+We might be able to determine which memory tier it is by the durations.
 
 **Dwarkesh Patel**
 
@@ -1404,11 +1404,11 @@ There's a construction that exists in ciphers and then was imported into neural 
 
 You'd like to build something out of this that is invertible. The construction we're going to make is going to be a two-input function rather than a one-input function. We're going to apply *f*(*x*). We need to actually remember what *x* was, so we're going to stick *x* over here so that we can work backwards, and then we also can't drop *y*. We're going to remember *y*, and we're going to add them together to form this tuple.
 
-The way to invert this, if you think I have this output and I want to recover *x* and *y*, I can easily recover *x*. That's right there, I just read it off. To recover *y*, if this thing was called *z*, I can recover *y* by *z* minus *f*(*x*), because I've already recovered *x*. That means this construction is invertible. 
+The way to invert this, if you think I have this output and I want to recover *x* and *y*, I can easily recover *x*. That's right there, I just read it off. To recover *y*, if this thing was called *z*, I can recover *y* by *z* minus *f*(*x*), because I've already recovered *x*. That means this construction is invertible.
 
-This was used in ciphers a ton and still is used. It's one of the main mechanisms of constructing ciphers. Often you want ciphers to be invertible, especially the layers of ciphers, because that has better cryptographic properties. 
+This was used in ciphers a ton and still is used. It's one of the main mechanisms of constructing ciphers. Often you want ciphers to be invertible, especially the layers of ciphers, because that has better cryptographic properties.
 
-This has actually been ported over into neural nets. There's a 2017 paper called [RevNets](https://arxiv.org/abs/1707.04585), reversible networks. What it does is make the entire network invertible. You can apply it to any network, like a transformer network. I do a forwards pass, but then I can run the entire pass backwards as well. The whole neural network is invertible with exactly this construction. 
+This has actually been ported over into neural nets. There's a 2017 paper called [RevNets](https://arxiv.org/abs/1707.04585), reversible networks. What it does is make the entire network invertible. You can apply it to any network, like a transformer network. I do a forwards pass, but then I can run the entire pass backwards as well. The whole neural network is invertible with exactly this construction.
 
 This paper applied it to some layer, like a transformer layer, for example. We've got this function *f*, which is our transformer layer. Normally we would have just an input and then a residual connection coming out, and it gets added over here. Now, the variation of this is going to be we've got two inputs, *x* and *y*. *x* goes through the function, gets added to *y*, and then this becomes the new *x*, output *x*. Then this *x* becomes the output *y*.
 
