@@ -1,13 +1,11 @@
-# Dwarkesh Podcast Flashcards
+# Reiner Pope on Dwarkesh Podcast — Practice Questions
 
-Static site hosting practice flashcards I prepare for technical episodes of
-the Dwarkesh Podcast. One deck per guest, with click-to-reveal online and
-downloadable Anki / Markdown / transcript exports.
+Static site that hosts the practice flashcards from Reiner Pope's blackboard
+lecture on the Dwarkesh Podcast. Built with Next.js 14 (static export),
+Tailwind, and KaTeX.
 
-Built with Next.js 14 (static export), Tailwind, and KaTeX.
-
-- Landing page: lists every episode.
-- `/episodes/<slug>/`: flashcards + transcript for a single episode.
+- **Watch:** https://youtu.be/xmkSf5IS-zw
+- **Read:** https://www.dwarkesh.com/p/reiner-pope
 
 ## Local development
 
@@ -17,61 +15,26 @@ npm run dev
 # http://localhost:3000
 ```
 
-## Adding a new episode
+## Editing flashcards
 
-1. Drop the cleaned transcript at `transcripts/<slug>.md`.
-2. Create `lib/episodes/<slug>.ts` exporting a `const <slug>: Episode`:
+All cards live in [`lib/cards.ts`](./lib/cards.ts). Each `q` and `a` is a
+markdown string; `$inline$` and `$$block$$` LaTeX are rendered with KaTeX.
 
-   ```ts
-   import { Episode } from "../types";
+After edits, regenerate the export files:
 
-   export const someGuest: Episode = {
-     slug: "some-guest",
-     title: "Some Guest on the Dwarkesh Podcast",
-     guest: "Some Guest",
-     blurb: "One-line description shown on the landing page + episode header.",
-     date: "2026-05",                          // optional; "YYYY-MM" or "YYYY-MM-DD"
-     youtubeUrl: "https://youtu.be/...",       // optional; omit for upcoming episodes
-     substackUrl: "https://dwarkesh.com/...",  // optional
-     transcriptPath: "transcripts/some-guest.md",
-     note: "Optional banner shown above the cards.",
-     sections: [
-       {
-         id: "some-section-id",
-         timestamp: "00:00:00",                 // optional; drop for un-timestamped prep decks
-         title: "Section title",
-         cards: [{ q: "…", a: "…" }],
-       },
-     ],
-   };
-   ```
+```bash
+npm run export-files          # writes flashcards.{md,tsv,json} + transcript.md
+python3 scripts/build_anki.py # writes flashcards.apkg
+```
 
-3. Register the episode in `lib/episodes/index.ts` (the order there is the
-   order shown on the landing page).
+(The Python script needs `genanki`: `python3 -m pip install --user genanki`.)
 
-4. Regenerate the downloadable exports:
-
-   ```bash
-   npm run export-files          # writes flashcards.{md,tsv,json} + transcript.md
-   python3 scripts/build_anki.py # writes flashcards.apkg
-   ```
-
-   Outputs land in `public/exports/<slug>/`. The dev server hot-reloads edits
-   to `lib/episodes/*` but the two commands above must be rerun before the
-   download links see new content.
-
-## Writing cards
-
-Each `q` and `a` is a Markdown string.
-
-- `$inline$` and `$$block$$` LaTeX render with KaTeX (and MathJax in Anki).
-- Images in answers: `![alt](/images/file.png)`. Drop the PNG in
-  `public/images/`; the Anki build picks it up automatically.
-- Bold / italics / lists / inline code all work.
+The dev server picks up `lib/cards.ts` changes via hot reload, but you must
+rerun the two commands above for the downloadable exports to update.
 
 ## Deploying
 
-Static export goes to `out/`. Drop it on any host.
+Static export goes to `out/`. Drop it on any host:
 
 ### Vercel (one click)
 
@@ -79,38 +42,38 @@ Static export goes to `out/`. Drop it on any host.
 npx vercel deploy --prod
 ```
 
-### GitHub Pages / Netlify / Cloudflare Pages / S3 / …
+Vercel auto-detects Next.js and runs `npm run build`.
+
+### Anywhere else (GitHub Pages, Netlify, Cloudflare Pages, S3, …)
 
 ```bash
 npm run build
 # upload everything in out/
 ```
 
-## Repo layout
+## Files at a glance
 
-| Path                                        | What it is                                          |
-| ------------------------------------------- | --------------------------------------------------- |
-| `lib/types.ts`                              | `Episode`, `Section`, `Card` types                  |
-| `lib/episodes/index.ts`                     | Registry of all episodes (order = landing order)    |
-| `lib/episodes/<slug>.ts`                    | Per-episode data (metadata + sections + cards)      |
-| `transcripts/<slug>.md`                     | Source transcript (copied + fixed into exports)     |
-| `app/page.tsx`                              | Landing page (episode list)                         |
-| `app/episodes/[slug]/page.tsx`              | Per-episode page (static, prerendered)              |
-| `components/EpisodeHeader.tsx`              | Episode header with title, actions, downloads       |
-| `components/EpisodeView.tsx`                | Wires header + sidebar + sections + card state      |
-| `components/Sidebar.tsx`                    | Sticky section nav                                  |
-| `components/SectionView.tsx`                | Section header + list of `QuestionRow`s             |
-| `components/QuestionRow.tsx`                | One expandable Q/A row                              |
-| `components/Markdown.tsx`                   | Markdown + KaTeX renderer                           |
-| `public/images/`                            | Diagrams used inside answers                        |
-| `public/exports/<slug>/flashcards.apkg`     | Anki deck (import into Anki)                        |
-| `public/exports/<slug>/flashcards.md`       | Clean Markdown of all Q&A                           |
-| `public/exports/<slug>/flashcards.tsv`      | Tab-separated Anki fallback                         |
-| `public/exports/<slug>/flashcards.json`     | JSON dump consumed by `build_anki.py`               |
-| `public/exports/<slug>/transcript.md`       | Cleaned transcript with typo fixes applied          |
-| `scripts/export-files.ts`                   | Regenerates md/tsv/json/transcript for all episodes |
-| `scripts/build_anki.py`                     | Builds one `.apkg` per episode from JSON            |
+| Path                                | What it is                                            |
+| ----------------------------------- | ----------------------------------------------------- |
+| `lib/cards.ts`                      | Source of truth for all flashcards                    |
+| `app/page.tsx`                      | Overview page (sidebar + sections + click-to-reveal)  |
+| `components/`                       | UI building blocks                                    |
+| `public/images/`                    | Diagrams used inside answers                          |
+| `public/exports/flashcards.apkg`    | Anki deck (drag into Anki to import)                  |
+| `public/exports/flashcards.md`      | Clean markdown of all Q&A                             |
+| `public/exports/flashcards.tsv`     | Tab-separated for Anki CSV import (fallback)          |
+| `public/exports/flashcards.json`    | JSON dump used by `build_anki.py`                     |
+| `public/exports/transcript.md`      | Cleaned-up transcript (typos fixed)                   |
+| `scripts/export-files.ts`           | Regenerates the markdown / tsv / json exports         |
+| `scripts/build_anki.py`             | Regenerates the .apkg from the JSON dump              |
+
+## Typo fixes applied vs. the original docx
+
+- Section 2 title: `across a GPU racks` → `across GPU racks` (also fixed in transcript export)
+- Section 1: `keen decreasing` → `keep decreasing`
+- Section 5: question said `500M tokens/sec`; the answer's math used `50M`. Fixed question to `50M tokens/sec` (matches the 200T tokens / 100× answer).
+- Section 5: normalized lowercase `x` → `×` in one equation.
 
 ## Credits
 
-Questions by Dwarkesh Patel. Lectures / interviews by the guests themselves.
+Questions written by Dwarkesh Patel. Lecture by Reiner Pope.

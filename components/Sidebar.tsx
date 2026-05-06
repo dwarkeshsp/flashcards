@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Section } from "@/lib/types";
+import { Section } from "@/lib/cards";
 
 export function Sidebar({ sections }: { sections: Section[] }) {
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "");
@@ -35,7 +35,7 @@ export function Sidebar({ sections }: { sections: Section[] }) {
         Sections
       </h2>
       <ol className="space-y-1.5">
-        {sections.map((s) => {
+        {sections.map((s, i) => {
           const active = s.id === activeId;
           return (
             <li key={s.id}>
@@ -48,14 +48,16 @@ export function Sidebar({ sections }: { sections: Section[] }) {
                 }`}
               >
                 <div className="flex items-baseline gap-2">
-                  {s.timestamp ? (
-                    <span className="text-[0.7rem] tabular-nums text-ink-faint">
-                      {s.timestamp}
-                    </span>
-                  ) : null}
                   <span className="text-[0.7rem] tabular-nums text-ink-faint">
-                    {s.cards.length > 0 ? `${s.cards.length} cards` : "transcript only"}
+                    {s.timestamp}
                   </span>
+                  {s.cards.length > 0 ? (
+                    <span className="text-[0.7rem] tabular-nums text-ink-faint">
+                      · {s.cards.length}
+                    </span>
+                  ) : (
+                    <span className="text-[0.7rem] italic text-ink-faint">· transcript</span>
+                  )}
                 </div>
                 <div className="mt-0.5 text-[0.875rem] leading-snug">
                   {s.title}

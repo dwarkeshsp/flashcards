@@ -1,5 +1,5 @@
 /**
- * Generates static export files served from /public/exports/<slug>/:
+ * Generates static export files served from /public/exports:
  *   - flashcards.md      Clean markdown of all Q&A
  *   - flashcards.tsv     Tab-separated for Anki import (fallback)
  *   - flashcards.json    JSON dump for the Python apkg builder
@@ -8,33 +8,29 @@
  * Run via:  npm run export-files
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { episodes } from "../lib/episodes";
-import { Episode, totalCardCount } from "../lib/types";
+import { episode, sections, totalCardCount } from "../lib/cards";
 
 const ROOT = process.cwd();
-const EXPORTS_ROOT = join(ROOT, "public", "exports");
+const OUT = join(ROOT, "public", "exports");
+mkdirSync(OUT, { recursive: true });
 
-function buildFlashcardsMd(ep: Episode): string {
+// ----- flashcards.md -----
+function buildFlashcardsMd(): string {
   const lines: string[] = [];
-  lines.push(`# ${ep.title}`);
+  lines.push(`# ${episode.title} — ${episode.subtitle}`);
   lines.push("");
-  if (ep.youtubeUrl) lines.push(`- YouTube: ${ep.youtubeUrl}`);
-  if (ep.substackUrl) lines.push(`- Substack: ${ep.substackUrl}`);
-  lines.push(`- Total cards: ${totalCardCount(ep)}`);
+  lines.push(`- YouTube: ${episode.youtubeUrl}`);
+  lines.push(`- Substack: ${episode.substackUrl}`);
+  lines.push(`- Total cards: ${totalCardCount}`);
   lines.push("");
-  lines.push(ep.blurb);
+  lines.push(episode.blurb);
   lines.push("");
-  if (ep.note) {
-    lines.push(`> ${ep.note}`);
-    lines.push("");
-  }
   lines.push("---");
   lines.push("");
-  for (const s of ep.sections) {
-    const header = s.timestamp ? `## (${s.timestamp}) — ${s.title}` : `## ${s.title}`;
-    lines.push(header);
+  for (const s of sections) {
+    lines.push(`## (${s.timestamp}) — ${s.title}`);
     lines.push("");
     if (s.cards.length === 0) {
       lines.push("_No flashcards for this section yet._");
@@ -51,38 +47,43 @@ function buildFlashcardsMd(ep: Episode): string {
   return lines.join("\n");
 }
 
+writeFileSync(join(OUT, "flashcards.md"), buildFlashcardsMd(), "utf8");
+console.log("✓ flashcards.md");
+
+// ----- flashcards.tsv (CSV/TSV fallback for Anki) -----
 function escapeAnkiField(s: string): string {
-  // For Anki CSV/TSV import: HTML allowed; convert markdown lightly and preserve LaTeX.
-  // LaTeX is kept as MathJax-style \( \) and \[ \].
+  // For Anki CSV import: HTML allowed; convert markdown lightly and preserve LaTeX
+  // We keep LaTeX as MathJax-style \( \) and \[ \].
   return s.replace(/\t/g, " ").replace(/\r?\n/g, "<br>").replace(/"/g, '""');
 }
 
 function mdToAnkiHtml(s: string): string {
+  // Convert $$...$$ -> \[ ... \] and $...$ -> \( ... \)
   let out = s.replace(/\$\$([\s\S]+?)\$\$/g, (_m, x) => `\\[${x}\\]`);
   out = out.replace(/\$([^\n$]+?)\$/g, (_m, x) => `\\(${x}\\)`);
+  // Bold
   out = out.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  // Italics
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>");
+  // Inline code
   out = out.replace(/`([^`]+)`/g, "<code>$1</code>");
+  // Image: ![alt](src) -> <img src="src" alt="alt">
   out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
     const filename = src.split("/").pop() ?? src;
     return `<img src="${filename}" alt="${alt}">`;
   });
+  // Lists: bullet "- " at line start -> <br>• ...
   out = out
     .split("\n")
     .map((l) => (/^\s*-\s+/.test(l) ? l.replace(/^\s*-\s+/, "• ") : l))
     .join("\n");
-  out = out
-    .split("\n")
-    .map((l) => (/^\s*\d+\.\s+/.test(l) ? l.replace(/^\s*(\d+)\.\s+/, "$1. ") : l))
-    .join("\n");
   return out.trim();
 }
 
-function buildTsv(ep: Episode): string {
+function buildTsv(): string {
   const rows = ['"Question"\t"Answer"\t"Tags"'];
-  const deckTag = ep.slug.replace(/[^a-zA-Z0-9]+/g, "_");
-  for (const s of ep.sections) {
-    const tag = `${deckTag}::${s.id}`;
+  for (const s of sections) {
+    const tag = `Reiner_Pope::${s.id}`;
     s.cards.forEach((c) => {
       const q = `"${escapeAnkiField(mdToAnkiHtml(c.q))}"`;
       const a = `"${escapeAnkiField(mdToAnkiHtml(c.a))}"`;
@@ -93,21 +94,22 @@ function buildTsv(ep: Episode): string {
   return rows.join("\n");
 }
 
-function buildJson(ep: Episode): string {
+writeFileSync(join(OUT, "flashcards.tsv"), buildTsv(), "utf8");
+console.log("✓ flashcards.tsv");
+
+// ----- flashcards.json (used by build_anki.py) -----
+function buildJson(): string {
   return JSON.stringify(
     {
       meta: {
-        slug: ep.slug,
-        title: ep.title,
-        guest: ep.guest,
-        blurb: ep.blurb,
-        date: ep.date ?? null,
-        youtube: ep.youtubeUrl ?? null,
-        substack: ep.substackUrl ?? null,
+        title: episode.title,
+        subtitle: episode.subtitle,
+        youtube: episode.youtubeUrl,
+        substack: episode.substackUrl,
       },
-      sections: ep.sections.map((s) => ({
+      sections: sections.map((s) => ({
         id: s.id,
-        timestamp: s.timestamp ?? null,
+        timestamp: s.timestamp,
         title: s.title,
         cards: s.cards.map((c) => ({
           question_md: c.q,
@@ -122,46 +124,19 @@ function buildJson(ep: Episode): string {
   );
 }
 
-function applyTranscriptFixes(ep: Episode): string | null {
-  if (!ep.transcriptPath) return null;
-  const full = join(ROOT, ep.transcriptPath);
-  if (!existsSync(full)) {
-    console.warn(`  ⚠ transcript not found at ${ep.transcriptPath} (skipping)`);
-    return null;
-  }
-  let text = readFileSync(full, "utf8");
-  for (const { from, to } of ep.transcriptFixes ?? []) {
-    text = text.split(from).join(to);
-  }
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.trimEnd())
-    .join("\n");
+writeFileSync(join(OUT, "flashcards.json"), buildJson(), "utf8");
+console.log("✓ flashcards.json");
+
+// ----- transcript.md (cleaned typos) -----
+function cleanTranscript(): string {
+  const src = readFileSync(join(ROOT, "Reiner Pope [INT].md"), "utf8");
+  // Fix the same typos that appear in the transcript file.
+  return src
+    .replace(
+      "How MoE models are laid out across a GPU racks",
+      "How MoE models are laid out across GPU racks"
+    );
 }
 
-function exportEpisode(ep: Episode) {
-  const out = join(EXPORTS_ROOT, ep.slug);
-  mkdirSync(out, { recursive: true });
-  const cards = totalCardCount(ep);
-  console.log(`• ${ep.slug}  (${cards} cards, ${ep.sections.length} sections)`);
-
-  if (cards > 0) {
-    writeFileSync(join(out, "flashcards.md"), buildFlashcardsMd(ep), "utf8");
-    writeFileSync(join(out, "flashcards.tsv"), buildTsv(ep), "utf8");
-    writeFileSync(join(out, "flashcards.json"), buildJson(ep), "utf8");
-    console.log(`    ✓ flashcards.{md,tsv,json}`);
-  }
-
-  const transcript = applyTranscriptFixes(ep);
-  if (transcript) {
-    writeFileSync(join(out, "transcript.md"), transcript, "utf8");
-    console.log(`    ✓ transcript.md`);
-  }
-}
-
-function main() {
-  mkdirSync(EXPORTS_ROOT, { recursive: true });
-  for (const ep of episodes) exportEpisode(ep);
-}
-
-main();
+writeFileSync(join(OUT, "transcript.md"), cleanTranscript(), "utf8");
+console.log("✓ transcript.md");

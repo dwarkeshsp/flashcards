@@ -1,10 +1,7 @@
 {
   "meta": {
-    "slug": "reiner-pope",
-    "title": "Reiner Pope on the Dwarkesh Podcast",
-    "guest": "Reiner Pope",
-    "blurb": "Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.",
-    "date": "2025-10",
+    "title": "Flashcards for Reiner Pope on Dwarkesh Podcast",
+    "subtitle": "Practice Questions",
     "youtube": "https://youtu.be/xmkSf5IS-zw",
     "substack": "https://www.dwarkesh.com/p/reiner-pope"
   },
@@ -21,9 +18,9 @@
           "answer_html": "\\[T = \\max(t_{\\text{compute}},\\ t_{\\text{mem}})\\]"
         },
         {
-          "question_md": "Equation for $t_{\\text{compute}}$ — not accounting for attention",
+          "question_md": "Equation for $t_{\\text{compute}}$",
           "answer_md": "$$t_{\\text{compute}} = \\frac{B \\cdot N_{\\text{active}}}{\\text{FLOPs}}$$\n\nwhere $B$ is batch size, $N_{\\text{active}}$ is active parameters, and FLOPs is the compute throughput of the hardware.",
-          "question_html": "Equation for \\(t_{\\text{compute}}\\) — not accounting for attention",
+          "question_html": "Equation for \\(t_{\\text{compute}}\\)",
           "answer_html": "\\[t_{\\text{compute}} = \\frac{B \\cdot N_{\\text{active}}}{\\text{FLOPs}}\\]\n\nwhere \\(B\\) is batch size, \\(N_{\\text{active}}\\) is active parameters, and FLOPs is the compute throughput of the hardware."
         },
         {
