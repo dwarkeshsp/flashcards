@@ -1,0 +1,11 @@
+{
+  "slug": "jacob-kimmel",
+  "title": "Jacob Kimmel on the Dwarkesh Podcast",
+  "guest": "Jacob Kimmel",
+  "transcriptPath": "transcripts/jacob-kimmel.md",
+  "targetCards": 30,
+  "maxInterests": 40,
+  "chunkCharLimit": 18000,
+  "criticPasses": 1,
+  "notes": "Prepared for a future offline pipeline run. Produces review artifacts only; does not edit lib/episodes."
+}

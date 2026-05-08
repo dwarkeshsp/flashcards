@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "slug": "eric-jang",
+    "title": "Eric Jang on AlphaGo and AlphaZero",
+    "guest": "Eric Jang",
+    "blurb": "Candidate practice questions for Eric Jang's blackboard lecture on Go, Monte Carlo tree search, policy/value networks, self-play, and why AlphaGo-style learning differs from LLM RL.",
+    "date": "2026-05-07",
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "why-alphago-mattered",
+      "timestamp": "00:00:34",
+      "title": "Why AlphaGo was surprising",
+      "cards": [
+        {
+          "question_md": "What was the core mystery about AlphaGo that drew Eric Jang back to Go AI?",
+          "answer_md": "A relatively small neural network seemed to **amortize a very deep game-tree search**: Go looked intractable to brute-force search, yet a learned evaluator could make useful judgments without explicitly rolling out the whole tree.",
+          "question_html": "What was the core mystery about AlphaGo that drew Eric Jang back to Go AI?",
+          "answer_html": "A relatively small neural network seemed to <b>amortize a very deep game-tree search</b>: Go looked intractable to brute-force search, yet a learned evaluator could make useful judgments without explicitly rolling out the whole tree."
+        },
+        {
+          "question_md": "What did KataGo's 2020 result suggest about algorithmic tricks vs. the bitter lesson in Go?",
+          "answer_md": "KataGo showed that a strong Go bot could be trained with roughly a **40x compute reduction** relative to earlier approaches. Eric's question was which clever tricks still mattered after years of scaling and better tooling, and which could be replaced by simpler bitter-lesson-style compute plus LLM-assisted engineering.",
+          "question_html": "What did KataGo's 2020 result suggest about algorithmic tricks vs. the bitter lesson in Go?",
+          "answer_html": "KataGo showed that a strong Go bot could be trained with roughly a <b>40x compute reduction</b> relative to earlier approaches. Eric's question was which clever tricks still mattered after years of scaling and better tooling, and which could be replaced by simpler bitter-lesson-style compute plus LLM-assisted engineering."
+        }
+      ]
+    },
+    {
+      "id": "go-rules",
+      "timestamp": "00:07:36",
+      "title": "Go mechanics that matter for implementation",
+      "cards": [
+        {
+          "question_md": "In Go captures, which neighbors determine whether a stone or group has liberties?",
+          "answer_md": "Only the **orthogonal** neighbors count, not diagonals. A stone or connected group dies when all of its orthogonal liberties are occupied by the opponent.",
+          "question_html": "In Go captures, which neighbors determine whether a stone or group has liberties?",
+          "answer_html": "Only the <b>orthogonal</b> neighbors count, not diagonals. A stone or connected group dies when all of its orthogonal liberties are occupied by the opponent."
+        },
+        {
+          "question_md": "Why do Go AIs often use Tromp-Taylor scoring rather than ordinary human scoring conventions?",
+          "answer_md": "Tromp-Taylor scoring is algorithmically unambiguous: keep playing until the board resolves, then count controlled stones plus empty intersections not adjacent to the opponent. Human scoring often stops earlier because both players agree which groups are alive or dead.",
+          "question_html": "Why do Go AIs often use Tromp-Taylor scoring rather than ordinary human scoring conventions?",
+          "answer_html": "Tromp-Taylor scoring is algorithmically unambiguous: keep playing until the board resolves, then count controlled stones plus empty intersections not adjacent to the opponent. Human scoring often stops earlier because both players agree which groups are alive or dead."
+        },
+        {
+          "question_md": "How does Eric connect ordinary human Go scoring to the idea of a value function?",
+          "answer_md": "Humans often stop before every local fight is literally played out because they can look at the board and agree which areas are settled. That judgment is like an implicit **value function**: a fast estimate of who wins from a position without exhaustive rollout.\n\n![Eric Jang demonstrating Go scoring on the board](/images/eric-jang-go-scoring.jpg)",
+          "question_html": "How does Eric connect ordinary human Go scoring to the idea of a value function?",
+          "answer_html": "Humans often stop before every local fight is literally played out because they can look at the board and agree which areas are settled. That judgment is like an implicit <b>value function</b>: a fast estimate of who wins from a position without exhaustive rollout.\n\n<img src=\"eric-jang-go-scoring.jpg\" alt=\"Eric Jang demonstrating Go scoring on the board\">"
+        }
+      ]
+    },
+    {
+      "id": "mcts-search",
+      "timestamp": "00:16:51",
+      "title": "Monte Carlo tree search",
+      "cards": [
+        {
+          "question_md": "Why is exhaustive search hopeless for full-size Go?",
+          "answer_md": "A 19x19 board starts with up to 361 legal moves and games can run hundreds of moves. A naive tree is on the order of hundreds of choices to hundreds of layers deep, far beyond exhaustive enumeration.",
+          "question_html": "Why is exhaustive search hopeless for full-size Go?",
+          "answer_html": "A 19x19 board starts with up to 361 legal moves and games can run hundreds of moves. A naive tree is on the order of hundreds of choices to hundreds of layers deep, far beyond exhaustive enumeration."
+        },
+        {
+          "question_md": "In Eric's MCTS data structure, what does a node store besides its children?",
+          "answer_md": "For each action/child, it stores at least:\n\n- a **visit count** $N$\n- a mean action value $Q$\n- a prior action probability $P$\n\nThe action is often implicit: in a deterministic game, the child state tells you which move was taken.",
+          "question_html": "In Eric's MCTS data structure, what does a node store besides its children?",
+          "answer_html": "For each action/child, it stores at least:\n\n• a <b>visit count</b> \\(N\\)\n• a mean action value \\(Q\\)\n• a prior action probability \\(P\\)\n\nThe action is often implicit: in a deterministic game, the child state tells you which move was taken."
+        },
+        {
+          "question_md": "In UCB/PUCT-style selection, what are the two jobs of the score being maximized?",
+          "answer_md": "It combines **exploitation** and **exploration**. The $Q$ term says which action currently looks best; the bonus term pushes search toward actions that are promising under the prior and/or underexplored by visit count.\n\n![Eric Jang's blackboard setup for UCB and PUCT](/images/eric-jang-puct.jpg)",
+          "question_html": "In UCB/PUCT-style selection, what are the two jobs of the score being maximized?",
+          "answer_html": "It combines <b>exploitation</b> and <b>exploration</b>. The \\(Q\\) term says which action currently looks best; the bonus term pushes search toward actions that are promising under the prior and/or underexplored by visit count.\n\n<img src=\"eric-jang-puct.jpg\" alt=\"Eric Jang's blackboard setup for UCB and PUCT\">"
+        },
+        {
+          "question_md": "What are the four steps of one MCTS simulation in AlphaGo-style search?",
+          "answer_md": "1. **Selection:** walk down the current tree using PUCT.\n2. **Expansion:** add children at the new leaf.\n3. **Evaluation:** estimate the leaf's value, usually with the value network.\n4. **Backup:** propagate that estimate back up to update visit counts and $Q$ values.\n\n![MCTS loop diagram](/images/eric-jang-mcts-loop.svg)",
+          "question_html": "What are the four steps of one MCTS simulation in AlphaGo-style search?",
+          "answer_html": "1. <b>Selection:</b> walk down the current tree using PUCT.\n2. <b>Expansion:</b> add children at the new leaf.\n3. <b>Evaluation:</b> estimate the leaf's value, usually with the value network.\n4. <b>Backup:</b> propagate that estimate back up to update visit counts and \\(Q\\) values.\n\n<img src=\"eric-jang-mcts-loop.svg\" alt=\"MCTS loop diagram\">"
+        }
+      ]
+    },
+    {
+      "id": "policy-value-networks",
+      "timestamp": "00:39:03",
+      "title": "Policy and value networks",
+      "cards": [
+        {
+          "question_md": "Which part of AlphaGo attacks the depth of the search tree, and how?",
+          "answer_md": "The **value network** attacks depth. Instead of rolling a position all the way to terminal scoring, it estimates the probability of winning from that board state.",
+          "question_html": "Which part of AlphaGo attacks the depth of the search tree, and how?",
+          "answer_html": "The <b>value network</b> attacks depth. Instead of rolling a position all the way to terminal scoring, it estimates the probability of winning from that board state."
+        },
+        {
+          "question_md": "Which part of AlphaGo attacks the breadth of the search tree, and how?",
+          "answer_md": "The **policy network** attacks breadth. It gives a prior distribution over plausible good moves, so MCTS does not have to spend equal effort on every legal action.",
+          "question_html": "Which part of AlphaGo attacks the breadth of the search tree, and how?",
+          "answer_html": "The <b>policy network</b> attacks breadth. It gives a prior distribution over plausible good moves, so MCTS does not have to spend equal effort on every legal action."
+        },
+        {
+          "question_md": "Why can the policy and value heads usually share one neural network trunk?",
+          "answer_md": "They should learn overlapping board representations. A move the policy thinks is promising should usually lead to states the value head thinks are good; later AlphaGo-style systems exploit that by using one trunk with separate policy and value heads.\n\n![Policy and value heads prune breadth and depth](/images/eric-jang-policy-value.svg)",
+          "question_html": "Why can the policy and value heads usually share one neural network trunk?",
+          "answer_html": "They should learn overlapping board representations. A move the policy thinks is promising should usually lead to states the value head thinks are good; later AlphaGo-style systems exploit that by using one trunk with separate policy and value heads.\n\n<img src=\"eric-jang-policy-value.svg\" alt=\"Policy and value heads prune breadth and depth\">"
+        }
+      ]
+    },
+    {
+      "id": "self-play-learning",
+      "timestamp": "01:05:01",
+      "title": "Self-play and policy improvement",
+      "cards": [
+        {
+          "question_md": "What is the key training target for the policy network after MCTS runs on a move?",
+          "answer_md": "The policy is trained to imitate the **improved visit-count distribution** produced by MCTS, not merely the raw move it originally preferred.",
+          "question_html": "What is the key training target for the policy network after MCTS runs on a move?",
+          "answer_html": "The policy is trained to imitate the <b>improved visit-count distribution</b> produced by MCTS, not merely the raw move it originally preferred."
+        },
+        {
+          "question_md": "Why is AlphaGo-style learning more stable than just reinforcing whichever side won a game?",
+          "answer_md": "MCTS gives a better local target for each move: \"search says this move distribution is better from this state.\" Winner-only imitation gives a sparse trajectory-level signal, so the few genuinely decisive moves are drowned in many neutral moves.",
+          "question_html": "Why is AlphaGo-style learning more stable than just reinforcing whichever side won a game?",
+          "answer_html": "MCTS gives a better local target for each move: \"search says this move distribution is better from this state.\" Winner-only imitation gives a sparse trajectory-level signal, so the few genuinely decisive moves are drowned in many neutral moves."
+        },
+        {
+          "question_md": "Why can MCTS be viewed as an improvement operator in AlphaGo?",
+          "answer_md": "Given a current policy/value network, MCTS spends extra test-time compute to produce a stronger move distribution. Training the policy to predict that distribution amortizes part of the search into the next network.\n\n![MCTS relabels trajectories with better local actions](/images/eric-jang-credit-assignment.svg)",
+          "question_html": "Why can MCTS be viewed as an improvement operator in AlphaGo?",
+          "answer_html": "Given a current policy/value network, MCTS spends extra test-time compute to produce a stronger move distribution. Training the policy to predict that distribution amortizes part of the search into the next network.\n\n<img src=\"eric-jang-credit-assignment.svg\" alt=\"MCTS relabels trajectories with better local actions\">"
+        },
+        {
+          "question_md": "Why is MCTS not guaranteed to improve the raw policy early in training?",
+          "answer_md": "The search is only as good as its ingredients. If the value estimates are wrong, terminal positions are underrepresented, or the number of simulations is too low, the backup process can propagate bad estimates and produce a worse policy distribution.",
+          "question_html": "Why is MCTS not guaranteed to improve the raw policy early in training?",
+          "answer_html": "The search is only as good as its ingredients. If the value estimates are wrong, terminal positions are underrepresented, or the number of simulations is too low, the backup process can propagate bad estimates and produce a worse policy distribution."
+        }
+      ]
+    },
+    {
+      "id": "llm-rl-analogy",
+      "timestamp": "02:11:13",
+      "title": "Connections to LLM reinforcement learning",
+      "cards": [
+        {
+          "question_md": "What credit-assignment problem did Eric hit when he tried to train by imitating only winning trajectories?",
+          "answer_md": "If two policies are near 50/50, a small excess of wins may be caused by one decisive move hidden among thousands of ordinary moves. Training on all winning moves overwhelms the useful signal with neutral labels.\n\n![Eric Jang drawing the credit-assignment analogy to LLM RL](/images/eric-jang-credit-assignment.jpg)",
+          "question_html": "What credit-assignment problem did Eric hit when he tried to train by imitating only winning trajectories?",
+          "answer_html": "If two policies are near 50/50, a small excess of wins may be caused by one decisive move hidden among thousands of ordinary moves. Training on all winning moves overwhelms the useful signal with neutral labels.\n\n<img src=\"eric-jang-credit-assignment.jpg\" alt=\"Eric Jang drawing the credit-assignment analogy to LLM RL\">"
+        },
+        {
+          "question_md": "Why is AlphaGo's MCTS feedback richer than ordinary trajectory-level RL feedback?",
+          "answer_md": "Trajectory-level RL asks, \"Did this whole rollout win?\" MCTS asks, at each state, \"After local search, which action distribution looks better?\" That turns sparse end-of-game feedback into much denser per-move supervision.",
+          "question_html": "Why is AlphaGo's MCTS feedback richer than ordinary trajectory-level RL feedback?",
+          "answer_html": "Trajectory-level RL asks, \"Did this whole rollout win?\" MCTS asks, at each state, \"After local search, which action distribution looks better?\" That turns sparse end-of-game feedback into much denser per-move supervision."
+        },
+        {
+          "question_md": "Why doesn't the AlphaGo recipe transfer directly to LLM reasoning?",
+          "answer_md": "Go has a compact, simulatable action space and a useful value function for truncating search. LLM reasoning has an enormous open-ended action space and no equally reliable local simulator/value function for arbitrary thoughts.",
+          "question_html": "Why doesn't the AlphaGo recipe transfer directly to LLM reasoning?",
+          "answer_html": "Go has a compact, simulatable action space and a useful value function for truncating search. LLM reasoning has an enormous open-ended action space and no equally reliable local simulator/value function for arbitrary thoughts."
+        },
+        {
+          "question_md": "What broader lesson does Eric draw from AlphaGo, AlphaFold, and similar systems?",
+          "answer_md": "Worst-case search may be intractable, but real problem distributions often have exploitable structure. Neural networks can compress or amortize a surprising amount of simulation into a small number of forward-pass layers.",
+          "question_html": "What broader lesson does Eric draw from AlphaGo, AlphaFold, and similar systems?",
+          "answer_html": "Worst-case search may be intractable, but real problem distributions often have exploitable structure. Neural networks can compress or amortize a surprising amount of simulation into a small number of forward-pass layers."
+        }
+      ]
+    }
+  ]
+}

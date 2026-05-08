@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" role="img" aria-labelledby="title desc">
+  <title id="title">Policy and value networks prune breadth and depth</title>
+  <desc id="desc">A board state enters a shared network with two heads: policy narrows which branches to search, and value truncates how deep the search must go.</desc>
+  <rect width="980" height="520" fill="#fbfaf6"/>
+  <rect x="40" y="34" width="900" height="452" rx="22" fill="#ffffff" stroke="#ded8ca" stroke-width="2"/>
+  <text x="72" y="88" font-family="Georgia, serif" font-size="30" fill="#1d1a17">Two neural shortcuts for Go search</text>
+  <text x="72" y="120" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" fill="#66615a">The policy head attacks breadth; the value head attacks depth.</text>
+
+  <g transform="translate(86 178)">
+    <rect width="142" height="142" rx="12" fill="#efe9dd" stroke="#cfc2ad"/>
+    <g stroke="#756d62" stroke-width="2">
+      <path d="M28 20v102M55 20v102M82 20v102M109 20v102"/>
+      <path d="M20 28h102M20 55h102M20 82h102M20 109h102"/>
+    </g>
+    <circle cx="55" cy="55" r="9" fill="#111"/>
+    <circle cx="82" cy="55" r="9" fill="#fff" stroke="#111" stroke-width="2"/>
+    <circle cx="55" cy="82" r="9" fill="#111"/>
+    <circle cx="109" cy="109" r="9" fill="#fff" stroke="#111" stroke-width="2"/>
+    <text x="17" y="177" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" fill="#24211e">encoded board</text>
+  </g>
+
+  <rect x="352" y="177" width="230" height="144" rx="16" fill="#eef3f8" stroke="#b7c7d9" stroke-width="2"/>
+  <text x="404" y="230" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="22" font-weight="700" fill="#24211e">shared network</text>
+  <text x="402" y="262" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" fill="#566675">ResNet / transformer</text>
+
+  <rect x="708" y="150" width="184" height="98" rx="14" fill="#f2f6ef" stroke="#b9c9ae" stroke-width="2"/>
+  <text x="757" y="188" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="22" font-weight="700" fill="#24211e">policy</text>
+  <text x="735" y="216" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15" fill="#5f6c58">which actions matter?</text>
+
+  <rect x="708" y="300" width="184" height="98" rx="14" fill="#f6ecec" stroke="#d4b2b2" stroke-width="2"/>
+  <text x="761" y="338" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="22" font-weight="700" fill="#24211e">value</text>
+  <text x="733" y="366" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="15" fill="#775b5b">who wins from here?</text>
+
+  <g fill="none" stroke="#9a6b4f" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M236 248 C280 248 310 248 352 248"/>
+    <path d="M582 230 C635 210 660 198 708 198"/>
+    <path d="M582 270 C636 292 661 326 708 348"/>
+  </g>
+
+  <text x="708" y="438" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" fill="#66615a">Together: sparse search instead of exhaustive search.</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#9a6b4f"/>
+    </marker>
+  </defs>
+</svg>

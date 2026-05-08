@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "slug": "jacob-kimmel",
+    "title": "Jacob Kimmel on the Dwarkesh Podcast",
+    "guest": "Jacob Kimmel",
+    "blurb": "Practice questions for Jacob Kimmel, drafted by the agent flashcard pipeline and human-reviewed before promotion.",
+    "date": null,
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "00-00-00-three-reasons-evolution-didn-t-optimize-for-longevity",
+      "timestamp": "00:07:39",
+      "title": "00:00:00 – Three reasons evolution didn’t optimize for longevity",
+      "cards": [
+        {
+          "question_md": "What is the counterargument to “evolution should always favor longer life because longer-lived organisms can have more descendants”?",
+          "answer_md": "If an intervention extends lifespan without restoring late-life function, older individuals may consume resources while contributing fewer offspring than younger replacements. From a selfish-gene view, turnover at high fitness can beat longevity with decline.",
+          "question_html": "What is the counterargument to “evolution should always favor longer life because longer-lived organisms can have more descendants”?",
+          "answer_html": "If an intervention extends lifespan without restoring late-life function, older individuals may consume resources while contributing fewer offspring than younger replacements. From a selfish-gene view, turnover at high fitness can beat longevity with decline."
+        },
+        {
+          "question_md": "In Kimmel's framing, what three search constraints limit what features evolution can discover, even if they are in principle easy to engineer?",
+          "answer_md": "- Mutation rate bounds the size of genetic steps and is constrained by cancer/deleterious-mutation risk;\n- population size bounds parallel search;\n- much selection pressure may be spent on things like infectious disease rather than late-life health.",
+          "question_html": "In Kimmel's framing, what three search constraints limit what features evolution can discover, even if they are in principle easy to engineer?",
+          "answer_html": "• Mutation rate bounds the size of genetic steps and is constrained by cancer/deleterious-mutation risk;\n• population size bounds parallel search;\n• much selection pressure may be spent on things like infectious disease rather than late-life health."
+        },
+        {
+          "question_md": "What reason does Jacob Kimmel suggest for thinking that lifetime mutations are not the cause of aging?",
+          "answer_md": "People with Lynch syndrome or DNA polymerase defects can have a mutation rate that is 10-1000 times higher than normal, and they seem fine.",
+          "question_html": "What reason does Jacob Kimmel suggest for thinking that lifetime mutations are not the cause of aging?",
+          "answer_html": "People with Lynch syndrome or DNA polymerase defects can have a mutation rate that is 10-1000 times higher than normal, and they seem fine."
+        }
+      ]
+    },
+    {
+      "id": "00-12-07-why-didn-t-humans-evolve-their-own-antibiotics",
+      "timestamp": "00:12:17",
+      "title": "00:12:07 – Why didn't humans evolve their own antibiotics?",
+      "cards": [
+        {
+          "question_md": "Why might microbes evolve antibiotics but humans not evolve their own antibiotic cassette, even though infection mattered a lot for human fitness?",
+          "answer_md": "Antibiotics are not a one-time invention; they are part of a Red Queen chemical arms race. Microbes have huge population sizes and can tolerate high mutation rates because failed mutants do not endanger a whole multicellular body. Humans cannot run that fast a chemical arms race: high mutation rates in metazoans risk cancer or organism-level failure",
+          "question_html": "Why might microbes evolve antibiotics but humans not evolve their own antibiotic cassette, even though infection mattered a lot for human fitness?",
+          "answer_html": "Antibiotics are not a one-time invention; they are part of a Red Queen chemical arms race. Microbes have huge population sizes and can tolerate high mutation rates because failed mutants do not endanger a whole multicellular body. Humans cannot run that fast a chemical arms race: high mutation rates in metazoans risk cancer or organism-level failure"
+        }
+      ]
+    },
+    {
+      "id": "00-25-26-de-aging-cells-via-epigenetic-reprogramming",
+      "timestamp": "00:25:26",
+      "title": "00:25:26 – De-aging cells via epigenetic reprogramming",
+      "cards": [
+        {
+          "question_md": "As of 2024, what are the 2 kinds of models NewLimit has been training?",
+          "answer_md": "1. `transcriptome → cell age`\n2. `transcriptome from old cells + the TF you want to test → whether that TF will make the cell look younger`",
+          "question_html": "As of 2024, what are the 2 kinds of models NewLimit has been training?",
+          "answer_html": "1. <code>transcriptome → cell age</code>\n2. <code>transcriptome from old cells + the TF you want to test → whether that TF will make the cell look younger</code>"
+        },
+        {
+          "question_md": "How many transcription factors are there in the human genome?",
+          "answer_md": "1600",
+          "question_html": "How many transcription factors are there in the human genome?",
+          "answer_html": "1600"
+        },
+        {
+          "question_md": "How did Yamanaka discover which transcription factors constituted the minimal set for converting somatic cells to iPSC?",
+          "answer_md": "He started with 24 transcription factors highly expressed in embryonic stem cells, showed all 24 together could reprogram fibroblasts to iPSCs, then systematically removed factors one by one to find the minimal essential set of four: OSKM.",
+          "question_html": "How did Yamanaka discover which transcription factors constituted the minimal set for converting somatic cells to iPSC?",
+          "answer_html": "He started with 24 transcription factors highly expressed in embryonic stem cells, showed all 24 together could reprogram fibroblasts to iPSCs, then systematically removed factors one by one to find the minimal essential set of four: OSKM."
+        }
+      ]
+    },
+    {
+      "id": "01-09-31-can-virtual-cells-break-eroom-s-law",
+      "timestamp": "01:17:23",
+      "title": "01:09:31 – Can virtual cells break Eroom's Law?",
+      "cards": [
+        {
+          "question_md": "How could a virtual-cell model make drug discovery less bespoke?",
+          "answer_md": "Run sparse perturbation experiments, measure how cell state changes, and train a model that predicts the effect of interventions. Then instead of testing every gene combination in the lab, search in silico for perturbations likely to move diseased or aged cells toward a desired healthy state. ",
+          "question_html": "How could a virtual-cell model make drug discovery less bespoke?",
+          "answer_html": "Run sparse perturbation experiments, measure how cell state changes, and train a model that predicts the effect of interventions. Then instead of testing every gene combination in the lab, search in silico for perturbations likely to move diseased or aged cells toward a desired healthy state."
+        }
+      ]
+    },
+    {
+      "id": "01-31-32-economic-models-for-pharma",
+      "timestamp": "01:32:07",
+      "title": "01:31:32 – Economic models for pharma",
+      "cards": [
+        {
+          "question_md": "Why do durable medicines create a reimbursement problem in a healthcare system where patients often switch insurers?",
+          "answer_md": "The insurer paying today may not be the insurer that benefits later. If a one-time therapy prevents expensive disease five or ten years out, but the patient changes plans after three or four years, the original insurer pays the upfront cost while another payer captures the savings. ",
+          "question_html": "Why do durable medicines create a reimbursement problem in a healthcare system where patients often switch insurers?",
+          "answer_html": "The insurer paying today may not be the insurer that benefits later. If a one-time therapy prevents expensive disease five or ten years out, but the patient changes plans after three or four years, the original insurer pays the upfront cost while another payer captures the savings."
+        },
+        {
+          "question_md": "What is the economic argument that preventive longevity medicines could reduce healthcare spending rather than increase it?",
+          "answer_md": "A lot of healthcare spending is concentrated after people are already very sick, especially in intensive late-stage care. If medicines preserve organ or immune function and prevent hospitalizations or late-life complications, they can shift spending from labor-intensive sick-care administration toward pharmaceutical prevention.",
+          "question_html": "What is the economic argument that preventive longevity medicines could reduce healthcare spending rather than increase it?",
+          "answer_html": "A lot of healthcare spending is concentrated after people are already very sick, especially in intensive late-stage care. If medicines preserve organ or immune function and prevent hospitalizations or late-life complications, they can shift spending from labor-intensive sick-care administration toward pharmaceutical prevention."
+        }
+      ]
+    }
+  ]
+}

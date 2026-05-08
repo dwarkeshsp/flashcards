@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "slug": "lewis-bollard",
+    "title": "Lewis Bollard on the Dwarkesh Podcast",
+    "guest": "Lewis Bollard",
+    "blurb": "Practice questions for Lewis Bollard, drafted by the agent flashcard pipeline and human-reviewed before promotion.",
+    "date": null,
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "opening",
+      "timestamp": "00:02:18",
+      "title": "Opening",
+      "cards": [
+        {
+          "question_md": "Why is factory-farmed chicken such a brutal price target for alternative proteins or higher-welfare substitutes?",
+          "answer_md": "Chicken is close to `2 × cheap grain + minimal overhead` economics.\n\nThe bird efficiently converts grain into meat, and factory farming removes many costly welfare inputs like space and comfort.",
+          "question_html": "Why is factory-farmed chicken such a brutal price target for alternative proteins or higher-welfare substitutes?",
+          "answer_html": "Chicken is close to <code>2 × cheap grain + minimal overhead</code> economics.\n\nThe bird efficiently converts grain into meat, and factory farming removes many costly welfare inputs like space and comfort."
+        }
+      ]
+    },
+    {
+      "id": "00-09-54-tech-that-s-sparing-100s-of-millions-of-animals-year",
+      "timestamp": "00:12:14",
+      "title": "00:09:54 – Tech that’s sparing 100s of millions of animals/year",
+      "cards": [
+        {
+          "question_md": "What is in-ovo sexing and what does it replace?",
+          "answer_md": "The egg industry has no use for male chicks: they cannot lay eggs and are not efficient meat birds. So they are usually killed after hatching.\n\nIn-ovo sexing scans eggs early, identifies male embryos, and removes those eggs before they hatch. ",
+          "question_html": "What is in-ovo sexing and what does it replace?",
+          "answer_html": "The egg industry has no use for male chicks: they cannot lay eggs and are not efficient meat birds. So they are usually killed after hatching.\n\nIn-ovo sexing scans eggs early, identifies male embryos, and removes those eggs before they hatch."
+        },
+        {
+          "question_md": "Give an example of the factory-farming “patch cycle” Bollard points to, where one welfare problem leads to another cruel intervention.",
+          "answer_md": "Example: pigs are brought indoors and bred for faster growth/aggression -> they bite tails -> tails are cut off -> teeth are clipped -> sows are put in crates -> drugs are added. Each patch manages a symptom while leaving the underlying system intact.",
+          "question_html": "Give an example of the factory-farming “patch cycle” Bollard points to, where one welfare problem leads to another cruel intervention.",
+          "answer_html": "Example: pigs are brought indoors and bred for faster growth/aggression -> they bite tails -> tails are cut off -> teeth are clipped -> sows are put in crates -> drugs are added. Each patch manages a symptom while leaving the underlying system intact."
+        }
+      ]
+    },
+    {
+      "id": "00-16-16-brainless-chickens-and-higher-welfare-breeds",
+      "timestamp": "00:17:02",
+      "title": "00:16:16 – Brainless chickens and higher welfare breeds",
+      "cards": [
+        {
+          "question_md": "Why doesn’t animal suffering automatically get selected away in factory farming if sick or injured animals are less productive?",
+          "answer_md": "If cramming twice as many animals into a barn causes 10% more deaths, the farm can still produce more meat overall.",
+          "question_html": "Why doesn’t animal suffering automatically get selected away in factory farming if sick or injured animals are less productive?",
+          "answer_html": "If cramming twice as many animals into a barn causes 10% more deaths, the farm can still produce more meat overall."
+        }
+      ]
+    }
+  ]
+}

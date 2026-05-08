@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560" role="img" aria-labelledby="title desc">
+  <title id="title">MCTS policy improvement loop</title>
+  <desc id="desc">A diagram showing policy and value networks feeding MCTS, MCTS producing improved visit-count labels, and those labels training the next policy.</desc>
+  <rect width="980" height="560" fill="#fbfaf6"/>
+  <rect x="38" y="36" width="904" height="488" rx="22" fill="#ffffff" stroke="#ded8ca" stroke-width="2"/>
+  <text x="70" y="86" font-family="Georgia, serif" font-size="30" fill="#1d1a17">AlphaGo's improvement loop</text>
+  <text x="70" y="120" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" fill="#66615a">Search creates a stronger target; the network learns to start closer to that target next time.</text>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18" fill="#24211e">
+    <rect x="76" y="198" width="190" height="94" rx="14" fill="#f5efe7" stroke="#cdbfaa"/>
+    <text x="111" y="238" font-weight="700">Board state</text>
+    <text x="105" y="265" font-size="15" fill="#66615a">current root</text>
+
+    <rect x="366" y="168" width="238" height="154" rx="16" fill="#eef3f8" stroke="#b7c7d9"/>
+    <text x="410" y="213" font-weight="700">Policy + value net</text>
+    <text x="398" y="244" font-size="15" fill="#566675">P(a|s): good moves</text>
+    <text x="398" y="269" font-size="15" fill="#566675">V(s): win estimate</text>
+
+    <rect x="714" y="176" width="176" height="138" rx="16" fill="#f2f6ef" stroke="#b9c9ae"/>
+    <text x="767" y="219" font-weight="700">MCTS</text>
+    <text x="742" y="250" font-size="15" fill="#5f6c58">select, expand</text>
+    <text x="742" y="273" font-size="15" fill="#5f6c58">evaluate, backup</text>
+
+    <rect x="584" y="396" width="246" height="76" rx="14" fill="#f6ecec" stroke="#d4b2b2"/>
+    <text x="627" y="428" font-weight="700">Improved policy label</text>
+    <text x="626" y="454" font-size="15" fill="#775b5b">visit-count distribution</text>
+
+    <rect x="198" y="386" width="226" height="96" rx="14" fill="#f7f3df" stroke="#d8cb8d"/>
+    <text x="246" y="426" font-weight="700">Supervised update</text>
+    <text x="225" y="452" font-size="15" fill="#746d46">train network to imitate</text>
+  </g>
+
+  <g fill="none" stroke="#9a6b4f" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M266 245 C304 244 324 244 366 244"/>
+    <path d="M604 244 C646 244 670 244 714 244"/>
+    <path d="M802 314 C799 366 780 393 830 432"/>
+    <path d="M584 434 C506 434 472 434 424 434"/>
+    <path d="M198 434 C118 414 78 356 130 292"/>
+  </g>
+
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#9a6b4f"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "slug": "dylan-patel",
+    "title": "Dylan Patel on the Dwarkesh Podcast",
+    "guest": "Dylan Patel",
+    "blurb": "Practice questions for Dylan Patel, drafted by the agent flashcard pipeline and human-reviewed before promotion.",
+    "date": null,
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "00-00-00-why-an-h100-is-worth-more-today-than-3-years-ago",
+      "timestamp": "00:00:00",
+      "title": "00:00:00 – Why an H100 is worth more today than 3 years ago",
+      "cards": [
+        {
+          "question_md": "Why might an H100 become more valuable even after newer GPUs like Blackwell or Rubin arrive?",
+          "answer_md": "Better models, cheaper serving, and larger demand can raise the value of each old GPU's output faster than hardware obsolescence lowers it.",
+          "question_html": "Why might an H100 become more valuable even after newer GPUs like Blackwell or Rubin arrive?",
+          "answer_html": "Better models, cheaper serving, and larger demand can raise the value of each old GPU's output faster than hardware obsolescence lowers it."
+        }
+      ]
+    },
+    {
+      "id": "00-00-00-why-an-h100-is-worth-more-today-than-3-years-ago-continued",
+      "timestamp": null,
+      "title": "00:00:00 – Why an H100 is worth more today than 3 years ago continued",
+      "cards": [
+        {
+          "question_md": "How can higher fixed compute costs push demand toward better (holding compute constant) AI models?",
+          "answer_md": "It is an Alchian-Allen style effect. If two options both inherit the same fixed cost, the higher-quality option becomes cheaper in relative terms. A $2 model versus a $1 model is 2x as expensive; add a $1 compute cost to both, and it is $3 versus $2, only 1.5x. If users must pay a large compute bill anyway, paying a bit more for the best model can look more attractive.",
+          "question_html": "How can higher fixed compute costs push demand toward better (holding compute constant) AI models?",
+          "answer_html": "It is an Alchian-Allen style effect. If two options both inherit the same fixed cost, the higher-quality option becomes cheaper in relative terms. A \\(2 model versus a \\)1 model is 2x as expensive; add a \\(1 compute cost to both, and it is \\)3 versus $2, only 1.5x. If users must pay a large compute bill anyway, paying a bit more for the best model can look more attractive."
+        }
+      ]
+    },
+    {
+      "id": "00-34-34-asml-will-be-the-1-constraint-for-ai-compute-scaling-by-2030",
+      "timestamp": "00:34:34",
+      "title": "00:34:34 – ASML will be the #1 constraint for AI compute scaling by 2030",
+      "cards": [
+        {
+          "question_md": "How does Dylan translate EUV tool throughput into a rough ceiling on AI data-center gigawatts?",
+          "answer_md": "Start with the wafers needed for 1 GW of AI chips: roughly 55k 3 nm wafers, 6k 5 nm wafers, and 170k DRAM wafers. Add up the EUV exposures across those wafers: about 2 million EUV passes. An EUV tool runs about 75 wafers/hour at about 90% uptime, so one AI gigawatt consumes roughly 3.5 EUV tools' worth of annual capacity.",
+          "question_html": "How does Dylan translate EUV tool throughput into a rough ceiling on AI data-center gigawatts?",
+          "answer_html": "Start with the wafers needed for 1 GW of AI chips: roughly 55k 3 nm wafers, 6k 5 nm wafers, and 170k DRAM wafers. Add up the EUV exposures across those wafers: about 2 million EUV passes. An EUV tool runs about 75 wafers/hour at about 90% uptime, so one AI gigawatt consumes roughly 3.5 EUV tools' worth of annual capacity."
+        },
+        {
+          "question_md": "Why can't ASML simply double EUV production if demand for AI chips explodes?",
+          "answer_md": "EUV scanners are constrained by specialized sub-supply chains, not just ASML's willingness to spend. The tool depends on pieces like the Cymer light source, reticle stage, wafer stage, and Zeiss optics. ",
+          "question_html": "Why can't ASML simply double EUV production if demand for AI chips explodes?",
+          "answer_html": "EUV scanners are constrained by specialized sub-supply chains, not just ASML's willingness to spend. The tool depends on pieces like the Cymer light source, reticle stage, wafer stage, and Zeiss optics."
+        }
+      ]
+    },
+    {
+      "id": "01-16-20-the-enormous-incoming-memory-crunch",
+      "timestamp": "01:16:20",
+      "title": "01:16:20 – The enormous incoming memory crunch",
+      "cards": [
+        {
+          "question_md": "Why can't AI accelerators simply replace HBM with commodity DRAM to get more memory bits per wafer?",
+          "answer_md": "Because many inference workloads are bandwidth-limited, not just capacity-limited. DDR may give more bits, but if weights and KV cache cannot move fast enough, the expensive compute sits idle. HBM is costly in wafer-area terms because it buys much higher bandwidth, which is often the scarce thing.",
+          "question_html": "Why can't AI accelerators simply replace HBM with commodity DRAM to get more memory bits per wafer?",
+          "answer_html": "Because many inference workloads are bandwidth-limited, not just capacity-limited. DDR may give more bits, but if weights and KV cache cannot move fast enough, the expensive compute sits idle. HBM is costly in wafer-area terms because it buys much higher bandwidth, which is often the scarce thing."
+        }
+      ]
+    },
+    {
+      "id": "01-55-03-space-gpus-aren-t-happening-this-decade",
+      "timestamp": "01:55:03",
+      "title": "01:55:03 – Space GPUs aren't happening this decade",
+      "cards": [
+        {
+          "question_md": "What is the crux of the argument against space GPUs as a near-term solution for AI scaling?",
+          "answer_md": "Space optimizes for cheap power, but near-term AI scaling is not mainly bottlenecked on power. It is bottlenecked on chips.",
+          "question_html": "What is the crux of the argument against space GPUs as a near-term solution for AI scaling?",
+          "answer_html": "Space optimizes for cheap power, but near-term AI scaling is not mainly bottlenecked on power. It is bottlenecked on chips."
+        }
+      ]
+    },
+    {
+      "id": "01-55-03-space-gpus-aren-t-happening-this-decade-continued",
+      "timestamp": "01:55:03",
+      "title": "01:55:03 – Space GPUs aren't happening this decade continued",
+      "cards": [
+        {
+          "question_md": "Why might a frontier lab prefer training a smaller model for RL even if a larger model is more capable per rollout?",
+          "answer_md": "The smaller model can finish RL and deployment sooner. Even if a larger model is more sample-efficient, its rollouts cost more and take longer, which may more than offset the benefits. ",
+          "question_html": "Why might a frontier lab prefer training a smaller model for RL even if a larger model is more capable per rollout?",
+          "answer_html": "The smaller model can finish RL and deployment sooner. Even if a larger model is more sample-efficient, its rollouts cost more and take longer, which may more than offset the benefits."
+        }
+      ]
+    },
+    {
+      "id": "02-24-35-robots-and-taiwan-risk",
+      "timestamp": "02:24:35",
+      "title": "02:24:35 – Robots and Taiwan risk",
+      "cards": [
+        {
+          "question_md": "Why might future robots rely on centralized cloud intelligence instead of carrying all intelligence onboard?",
+          "answer_md": "Cloud models can be larger and more efficient because they can batch inference across many tasks. The robot mainly needs low-latency local control: interpolation, grasping, force feedback, and other fast sensorimotor actions. Longer-horizon planning and richer world knowledge can be computed in the data center and sent back to the robot.",
+          "question_html": "Why might future robots rely on centralized cloud intelligence instead of carrying all intelligence onboard?",
+          "answer_html": "Cloud models can be larger and more efficient because they can batch inference across many tasks. The robot mainly needs low-latency local control: interpolation, grasping, force feedback, and other fast sensorimotor actions. Longer-horizon planning and richer world knowledge can be computed in the data center and sent back to the robot."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dwarkesh.com/schemas/agent-flashcards.schema.json",
+  "title": "Agent Flashcard Pipeline Artifacts",
+  "type": "object",
+  "$defs": {
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "title", "transcriptPath"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "guest": { "type": "string" },
+        "transcriptPath": { "type": "string", "minLength": 1 },
+        "youtubeUrl": { "type": "string" },
+        "substackUrl": { "type": "string" },
+        "notes": { "type": "string" },
+        "targetCards": { "type": "number", "minimum": 1 },
+        "maxInterests": { "type": "number", "minimum": 1 },
+        "maxChunks": { "type": "number", "minimum": 1 },
+        "chunkCharLimit": { "type": "number", "minimum": 1000 },
+        "criticPasses": { "type": "number", "minimum": 1 },
+        "cardDraftBatchSize": { "type": "number", "minimum": 1 }
+      }
+    },
+    "transcriptChunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "heading", "startLine", "endLine", "text"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "heading": { "type": "string", "minLength": 1 },
+        "startLine": { "type": "number", "minimum": 1 },
+        "endLine": { "type": "number", "minimum": 1 },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "candidateInterest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "chunkId", "title", "sourceExcerpt", "whyWorthRemembering"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "chunkId": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "sourceExcerpt": { "type": "string", "minLength": 1 },
+        "whyWorthRemembering": { "type": "string", "minLength": 1 },
+        "argumentCrux": { "type": "string" },
+        "technicalGrounding": { "type": "string" },
+        "cardShape": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "sectionTitle": { "type": "string" },
+        "priority": { "enum": ["high", "medium", "low"] }
+      }
+    },
+    "candidateCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "interestId", "sectionTitle", "sourceExcerpt", "q", "a"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "interestId": { "type": "string", "minLength": 1 },
+        "sectionTitle": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string" },
+        "sourceExcerpt": { "type": "string", "minLength": 1 },
+        "q": { "type": "string", "minLength": 1 },
+        "a": { "type": "string", "minLength": 1 },
+        "risk": { "type": "string" }
+      }
+    },
+    "critique": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pass", "classification", "targeting", "construction", "recommendation"],
+      "properties": {
+        "pass": { "type": "number", "minimum": 1 },
+        "classification": { "enum": ["T0", "T1", "T2", "T3"] },
+        "targeting": { "type": "string", "minLength": 1 },
+        "construction": { "type": "string", "minLength": 1 },
+        "recommendation": { "enum": ["reject", "rewrite", "polish", "accept"] },
+        "suggestedRewrite": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["q", "a"],
+          "properties": {
+            "q": { "type": "string", "minLength": 1 },
+            "a": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "reviewItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["card", "critiques"],
+      "properties": {
+        "card": { "$ref": "#/$defs/candidateCard" },
+        "critiques": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/critique" }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "updatedAt"],
+      "properties": {
+        "status": {
+          "enum": ["unreviewed", "accepted", "rejected", "edited", "rewrite-requested", "rewritten"]
+        },
+        "notes": { "type": "string" },
+        "editedCard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["q", "a"],
+          "properties": {
+            "q": { "type": "string", "minLength": 1 },
+            "a": { "type": "string", "minLength": 1 }
+          }
+        },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "rewriteRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cardId", "feedback", "revisedCard", "explanation", "critiques", "createdAt"],
+      "properties": {
+        "cardId": { "type": "string", "minLength": 1 },
+        "feedback": { "type": "string", "minLength": 1 },
+        "revisedCard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["q", "a"],
+          "properties": {
+            "q": { "type": "string", "minLength": 1 },
+            "a": { "type": "string", "minLength": 1 }
+          }
+        },
+        "explanation": { "type": "string", "minLength": 1 },
+        "critiques": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/critique" }
+        },
+        "agentId": { "type": "string" },
+        "runId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/manifest" },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chunks"],
+      "properties": {
+        "chunks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/transcriptChunk" }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interests"],
+      "properties": {
+        "interests": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/candidateInterest" }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cards"],
+      "properties": {
+        "cards": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/candidateCard" }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "items"],
+      "properties": {
+        "manifest": { "$ref": "#/$defs/manifest" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reviewItem" }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decisions"],
+      "properties": {
+        "decisions": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/decision" }
+        }
+      }
+    },
+    { "$ref": "#/$defs/rewriteRecord" }
+  ]
+}

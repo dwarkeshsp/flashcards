@@ -1,0 +1,31 @@
+{
+  "episode": "eric-jang",
+  "sourceVideo": "Eric Jang 5-7.mp4",
+  "snapshots": [
+    {
+      "timestamp": "00:10:24",
+      "path": "public/images/eric-jang-go-scoring.jpg",
+      "use": "Go scoring and human value-function analogy"
+    },
+    {
+      "timestamp": "00:29:48",
+      "path": "public/images/eric-jang-puct.jpg",
+      "use": "UCB / PUCT blackboard equation"
+    },
+    {
+      "timestamp": "00:56:03",
+      "path": "public/images/eric-jang-mcts-expansion.jpg",
+      "use": "Policy and value network sketch"
+    },
+    {
+      "timestamp": "02:13:30",
+      "path": "public/images/eric-jang-credit-assignment.jpg",
+      "use": "Credit assignment and LLM RL analogy"
+    }
+  ],
+  "generatedAssets": [
+    "public/images/eric-jang-mcts-loop.svg",
+    "public/images/eric-jang-policy-value.svg",
+    "public/images/eric-jang-credit-assignment.svg"
+  ]
+}

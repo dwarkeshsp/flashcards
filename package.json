@@ -1,23 +1,27 @@
 {
-  "name": "reiner-pope-flashcards",
+  "name": "dwarkesh-flashcards",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "agent:flashcards": "tsx scripts/agent-flashcards.ts",
+    "agent:review": "tsx scripts/agent-review.ts",
+    "agent:promote": "tsx scripts/agent-promote.ts",
     "export-files": "tsx scripts/export-files.ts",
     "build-anki": "python3 scripts/build_anki.py"
   },
   "dependencies": {
+    "@cursor/sdk": "^1.0.12",
+    "katex": "0.16.11",
     "next": "14.2.15",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-markdown": "9.0.1",
     "rehype-katex": "7.0.1",
     "remark-gfm": "4.0.0",
-    "remark-math": "6.0.0",
-    "katex": "0.16.11"
+    "remark-math": "6.0.0"
   },
   "devDependencies": {
     "@types/node": "20.16.10",

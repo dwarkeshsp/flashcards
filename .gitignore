@@ -3,5 +3,8 @@ node_modules
 out
 .DS_Store
 *.log
+*.mp4
 .vercel
 extracted_docx
+.agent-flashcards
+tsconfig.tsbuildinfo
