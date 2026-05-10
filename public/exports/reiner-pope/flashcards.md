@@ -136,11 +136,11 @@ $$200\text{T} / 2\text{T} = 100\times$$
 
 ## (01:33:02) — Deducing inference memory costs from API pricing
 
-### Q1. Why does Gemini charge $\sim 50\%$ more for tokens above 200K context? At a high level, what's happening?
+### Q1. Why does Gemini charge ~ 50% more for tokens above 200K context? At a high level, what's happening?
 
-Below this point, you're compute bound, whose cost is flat as context length increases.
+Below this point, you're compute bound, where marginal cost per token is flat as context length increases.
 
-Above this point, you're memory time bound, thanks to KV cache growing, and that increases linearly with context length.
+Above this point, you're memory time bound, thanks to KV cache growing, and so marginal token cost increases linearly with context length.
 
 ### Q2. Sketch compute and memory time per token as context length increases. Then also sketch the pricing per token and how it changes at the crossover point.
 

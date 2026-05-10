@@ -5,6 +5,7 @@ import { Episode } from "@/lib/types";
 import { EpisodeHeader } from "./EpisodeHeader";
 import { SectionView } from "./SectionView";
 import { Sidebar } from "./Sidebar";
+import { Footer } from "./Footer";
 
 export function EpisodeView({ episode }: { episode: Episode }) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set());
@@ -70,29 +71,7 @@ export function EpisodeView({ episode }: { episode: Episode }) {
             })}
           </div>
         </div>
-        <footer className="border-t border-rule py-10 text-center text-[0.78rem] text-ink-faint">
-          <p>
-            Made by{" "}
-            <a
-              href="https://www.dwarkesh.com"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="underline decoration-rule hover:decoration-accent"
-            >
-              Dwarkesh Patel
-            </a>{" "}
-            with{" "}
-            <a
-              href="https://cursor.com"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="underline decoration-rule hover:decoration-accent"
-            >
-              Cursor
-            </a>
-            .
-          </p>
-        </footer>
+        <Footer variant="episode" />
       </main>
     </div>
   );

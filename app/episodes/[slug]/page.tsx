@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { episodes, getEpisode } from "@/lib/episodes";
+import { getSiteEpisode, siteEpisodes } from "@/lib/episodes";
 import { EpisodeView } from "@/components/EpisodeView";
 
 export function generateStaticParams() {
-  return episodes.map((e) => ({ slug: e.slug }));
+  return siteEpisodes.map((e) => ({ slug: e.slug }));
 }
 
 export function generateMetadata({
@@ -12,7 +12,7 @@ export function generateMetadata({
 }: {
   params: { slug: string };
 }): Metadata {
-  const episode = getEpisode(params.slug);
+  const episode = getSiteEpisode(params.slug);
   if (!episode) return { title: "Not found" };
   return {
     title: `${episode.title} — Flashcards`,
@@ -26,7 +26,7 @@ export function generateMetadata({
 }
 
 export default function EpisodePage({ params }: { params: { slug: string } }) {
-  const episode = getEpisode(params.slug);
+  const episode = getSiteEpisode(params.slug);
   if (!episode) notFound();
   return <EpisodeView episode={episode} />;
 }

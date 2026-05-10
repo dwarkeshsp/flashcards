@@ -7,4 +7,5 @@ out
 .vercel
 extracted_docx
 .agent-flashcards
+.agent-venv
 tsconfig.tsbuildinfo

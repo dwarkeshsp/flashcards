@@ -4,7 +4,7 @@
     "title": "Reiner Pope on the Dwarkesh Podcast",
     "guest": "Reiner Pope",
     "blurb": "Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.",
-    "date": "2025-10",
+    "date": "2026-04",
     "youtube": "https://youtu.be/xmkSf5IS-zw",
     "substack": "https://www.dwarkesh.com/p/reiner-pope"
   },
@@ -170,10 +170,10 @@
       "title": "Deducing inference memory costs from API pricing",
       "cards": [
         {
-          "question_md": "Why does Gemini charge $\\sim 50\\%$ more for tokens above 200K context? At a high level, what's happening?",
-          "answer_md": "Below this point, you're compute bound, whose cost is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and that increases linearly with context length.",
-          "question_html": "Why does Gemini charge \\(\\sim 50\\%\\) more for tokens above 200K context? At a high level, what's happening?",
-          "answer_html": "Below this point, you're compute bound, whose cost is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and that increases linearly with context length."
+          "question_md": "Why does Gemini charge ~ 50% more for tokens above 200K context? At a high level, what's happening?",
+          "answer_md": "Below this point, you're compute bound, where marginal cost per token is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and so marginal token cost increases linearly with context length.",
+          "question_html": "Why does Gemini charge ~ 50% more for tokens above 200K context? At a high level, what's happening?",
+          "answer_html": "Below this point, you're compute bound, where marginal cost per token is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and so marginal token cost increases linearly with context length."
         },
         {
           "question_md": "Sketch compute and memory time per token as context length increases. Then also sketch the pricing per token and how it changes at the crossover point.",

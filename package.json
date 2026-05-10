@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "agent:flashcards": "tsx scripts/agent-flashcards.ts",
-    "agent:review": "tsx scripts/agent-review.ts",
-    "agent:promote": "tsx scripts/agent-promote.ts",
+    "pipeline": "tsx scripts/pipeline/run.ts",
     "export-files": "tsx scripts/export-files.ts",
     "build-anki": "python3 scripts/build_anki.py"
   },

@@ -1,122 +1,102 @@
 # Eric Jang on AlphaGo and AlphaZero
 
-- Total cards: 20
+- Total cards: 10
 
-Candidate practice questions for Eric Jang's blackboard lecture on Go, Monte Carlo tree search, policy/value networks, self-play, and why AlphaGo-style learning differs from LLM RL.
+Practice questions for Eric Jang's blackboard lecture on building AlphaGo from scratch: Go, MCTS, policy and value networks, and how AlphaZero-style learning compares to LLM RL.
 
-> Draft deck generated for review from the transcript plus local blackboard video snapshots. Treat these as candidates: the review artifacts flag likely T2/T3 cards, not final editorial judgment.
+> Generated end-to-end by parallel Cursor SDK agents (Opus 4.7) with web search and matplotlib visual tooling. See scripts/pipeline/run.ts.
 
 ---
 
-## (00:00:34) — Why AlphaGo was surprising
+## (01:02:31) — Why AlphaGo's RL is elegant
 
-### Q1. What was the core mystery about AlphaGo that drew Eric Jang back to Go AI?
+### Q1. Why does AlphaGo's training avoid the sparse-reward exploration problem that LLM RL has to solve?
 
-A relatively small neural network seemed to **amortize a very deep game-tree search**: Go looked intractable to brute-force search, yet a learned evaluator could make useful judgments without explicitly rolling out the whole tree.
+Because **MCTS run on top of the current policy net $\pi_\theta$ is a policy-improvement operator**: its visit-count distribution is (typically) a strictly better policy than $\pi_\theta$ itself. So $\pi_\theta$ is just trained to imitate the MCTS distribution — supervised learning on *improved labels*, with no need to first achieve a non-zero success rate by random exploration.
 
-### Q2. What did KataGo's 2020 result suggest about algorithmic tricks vs. the bitter lesson in Go?
+![Why AlphaGo's RL is elegant](/images/eric-jang/alphago-bypasses-sparse-rl.png)
 
-KataGo showed that a strong Go bot could be trained with roughly a **40x compute reduction** relative to earlier approaches. Eric's question was which clever tricks still mattered after years of scaling and better tooling, and which could be replaced by simpler bitter-lesson-style compute plus LLM-assisted engineering.
+## (01:07) — Self-play as policy improvement
 
-## (00:07:36) — Go mechanics that matter for implementation
+### Q1. In AlphaGo's self-play loop, every position's MCTS visit distribution is used as a supervised label for the policy net. On a test-time-scaling plot (x = num MCTS simulations, y = win rate), what does this distillation step do to the curve from iteration $k$ to iteration $k{+}1$, and why?
 
-### Q1. In Go captures, which neighbors determine whether a stone or group has liberties?
+Iter $k{+}1$'s curve **starts where iter $k$'s curve ended after $N$ simulations.** Distilling the visit distribution amortizes those $N$ sims of search into the policy weights, so the new "shoot-from-the-hip" net plays at iter $k$'s post-search level for free.
 
-Only the **orthogonal** neighbors count, not diagonals. A stone or connected group dies when all of its orthogonal liberties are occupied by the opponent.
+![Self-play as policy improvement](/images/eric-jang/mcts-distillation-amortization.png)
 
-### Q2. Why do Go AIs often use Tromp-Taylor scoring rather than ordinary human scoring conventions?
+## (02:47:00) — Why MCTS hasn't taken over LLMs
 
-Tromp-Taylor scoring is algorithmically unambiguous: keep playing until the board resolves, then count controlled stones plus empty intersections not adjacent to the opponent. Human scoring often stops earlier because both players agree which groups are alive or dead.
+### Q1. AlphaGo's PUCT action selection uses the exploration bonus $C_{\text{PUCT}}\,P(a)\,\dfrac{\sqrt{N}}{1+N_a}$. Why does this term stop guiding search when MCTS is applied over an LLM's ~100k-token vocabulary?
 
-### Q3. How does Eric connect ordinary human Go scoring to the idea of a value function?
+Because you essentially **never sample the same child token more than once**. Across a ~100k-vocab branching factor, $N_a$ stays at 0 (or 1) for almost every action, so the $\sqrt{N}/(1+N_a)$ ratio collapses to roughly the same value everywhere — the "have I tried this child enough times?" signal that PUCT is built around no longer discriminates between actions. The heuristic was designed for Go's ≤361 actions, where the same child is revisited many times per node; that assumption is what breaks for language.
 
-Humans often stop before every local fight is literally played out because they can look at the board and agree which areas are settled. That judgment is like an implicit **value function**: a fast estimate of who wins from a position without exhaustive rollout.
+![Why MCTS hasn't taken over LLMs](/images/eric-jang/mcts-fails-on-llms.png)
 
-![Eric Jang demonstrating Go scoring on the board](/images/eric-jang-go-scoring.jpg)
+## (01:30:00) — MCTS algorithm
 
-## (00:16:51) — Monte Carlo tree search
+### Q1. In AlphaGo's MCTS, name the four phases of a single simulation, **in order**.
 
-### Q1. Why is exhaustive search hopeless for full-size Go?
+**select → expand → evaluate → backup**
 
-A 19x19 board starts with up to 361 legal moves and games can run hundreds of moves. A naive tree is on the order of hundreds of choices to hundreds of layers deep, far beyond exhaustive enumeration.
+![MCTS algorithm](/images/eric-jang/mcts-four-steps.png)
 
-### Q2. In Eric's MCTS data structure, what does a node store besides its children?
+## (01:22:50) — Why naive self-play stalls
 
-For each action/child, it stores at least:
+### Q1. Eric implements a self-play loop against KataGo where, after MCTS rollouts, he supervises the policy on the moves of *winning* games (REINFORCE-style, with the win/lose indicator as the weight). It plateaus at ~50%. He attributes the failure to a single quantitative scaling law on the policy gradient. **What is that scaling, and where does the extra factor of $T$ come from?**
 
-- a **visit count** $N$
-- a mean action value $Q$
-- a prior action probability $P$
+$$\mathrm{Var}\!\left[\nabla_{\!\theta}\,\mathcal{L}\right]\;\propto\;T^{2}$$
 
-The action is often implicit: in a deterministic game, the child state tells you which move was taken.
+in the episode length $T$. The extra factor of $T$ (vs the $\sim T$ you'd get from independent samples) comes from the fact that the per-step log-probs are produced by **the same policy across time**, so the actions are correlated; squaring the sum-over-time inside the variance picks up $\sim T^{2}$ cross-terms. For Go, $T \approx 150$ moves per side, so any single decisive move is buried under noise from the many neutral moves and the gradient carries no usable signal.
 
-### Q3. In UCB/PUCT-style selection, what are the two jobs of the score being maximized?
+![Why naive self-play stalls](/images/eric-jang/naive-winner-imitation-fails.png)
 
-It combines **exploitation** and **exploration**. The $Q$ term says which action currently looks best; the bonus term pushes search toward actions that are promising under the prior and/or underexplored by visit count.
+## (00:29:48) — Action selection inside MCTS
 
-![Eric Jang's blackboard setup for UCB and PUCT](/images/eric-jang-puct.jpg)
+### Q1. Write AlphaGo's **PUCT** rule for picking which child to descend into during MCTS, and label what each of its four pieces — $Q(s,a)$, $c_{\mathrm{PUCT}}$, $P(a)$, and $\sqrt{N}/(1+N_a)$ — contributes.
 
-### Q4. What are the four steps of one MCTS simulation in AlphaGo-style search?
+$$a^{\star} \;=\; \arg\max_{a}\;\Bigl[\,Q(s,a)\;+\;c_{\mathrm{PUCT}}\,P(a)\,\frac{\sqrt{N}}{1+N_a}\,\Bigr]$$
 
-1. **Selection:** walk down the current tree using PUCT.
-2. **Expansion:** add children at the new leaf.
-3. **Evaluation:** estimate the leaf's value, usually with the value network.
-4. **Backup:** propagate that estimate back up to update visit counts and $Q$ values.
+- $Q(s,a)$ — **exploit**: mean action value of this child (avg result of rollouts that have gone through it).
+- $c_{\mathrm{PUCT}}$ — **exploration weight**: tuning constant trading exploit vs exploration.
+- $P(a)$ — **policy prior** from the network: steers exploration toward moves the policy thinks are strong.
+- $\dfrac{\sqrt{N}}{1+N_a}$ — **visit-count bonus**: huge when $N_a=0$, decays as that child is sampled, so under-tried children get pulled in.
 
-![MCTS loop diagram](/images/eric-jang-mcts-loop.svg)
+($N$ = parent's total visits; $N_a$ = visits to this specific child.)
 
-## (00:39:03) — Policy and value networks
+![Action selection inside MCTS](/images/eric-jang/puct-selection-rule.png)
 
-### Q1. Which part of AlphaGo attacks the depth of the search tree, and how?
+## (03:28:00) — RL vs supervised learning information rate
 
-The **value network** attacks depth. Instead of rolling a position all the way to terminal scoring, it estimates the probability of winning from that board state.
+### Q1. If your policy's pass rate on a token (or trajectory) is $p$, how many bits per sample does cross-entropy supervised learning extract, and how many does naive binary-reward RL extract? What does each do as $p \to 0$?
 
-### Q2. Which part of AlphaGo attacks the breadth of the search tree, and how?
+- **SL (cross-entropy on the labeled token):** $-\log p$ bits per sample, deterministic given the label. Diverges to $\infty$ as $p \to 0$ — every miss tells you exactly how far the predicted distribution sits from the label.
+- **RL (binary success/failure):** $H(p) = -p\log p - (1-p)\log(1-p)$ expected bits per sample, averaged over the Bernoulli outcome. Peaks at $1$ bit when $p = 1/2$ (a coin flip), and collapses to $0$ as $p \to 0$ or $p \to 1$.
 
-The **policy network** attacks breadth. It gives a prior distribution over plausible good moves, so MCTS does not have to spend equal effort on every legal action.
+So a cold policy (tiny $p$) keeps getting unbounded SL signal but a vanishing expected RL signal — "supervision through a straw."
 
-### Q3. Why can the policy and value heads usually share one neural network trunk?
+![RL vs supervised learning information rate](/images/eric-jang/supervised-vs-rl-bits-per-sample.png)
 
-They should learn overlapping board representations. A move the policy thinks is promising should usually lead to states the value head thinks are good; later AlphaGo-style systems exploit that by using one trunk with separate policy and value heads.
+## (00:13:59) — Computer Go scoring
 
-![Policy and value heads prune breadth and depth](/images/eric-jang-policy-value.svg)
+### Q1. Why do Go AIs train and resolve games under **Tromp-Taylor** rules instead of standard human (e.g. Chinese) rules?
 
-## (01:05:01) — Self-play and policy improvement
+Tromp-Taylor scoring is **fully algorithmic** — it removes the human "agree this group is dead" consensus step.
 
-### Q1. What is the key training target for the policy network after MCTS runs on a move?
+- Human rules require both players to agree which stones are dead before counting; if they disagree, they keep playing.
+- Tromp-Taylor instead forces play to the **bitter end**: every contested stone has to actually be captured on the board, so the winner is decidable by code with no human-in-the-loop — safe to optimize against in self-play.
 
-The policy is trained to imitate the **improved visit-count distribution** produced by MCTS, not merely the raw move it originally preferred.
+## (00:09:48) — Go fundamentals
 
-### Q2. Why is AlphaGo-style learning more stable than just reinforcing whichever side won a game?
+### Q1. Why does a Go group need *two* eyes (not one) to be unconditionally alive?
 
-MCTS gives a better local target for each move: "search says this move distribution is better from this state." Winner-only imitation gives a sparse trajectory-level signal, so the few genuinely decisive moves are drowned in many neutral moves.
+Because only one stone is placed per turn. Filling either eye is suicide — the placed stone has 0 liberties because the *other* eye is still a liberty of the surrounding group — so the group can never be reduced to zero liberties. With one eye there is no fallback liberty, so filling it captures the group instead.
 
-### Q3. Why can MCTS be viewed as an improvement operator in AlphaGo?
+![Go fundamentals](/images/eric-jang/two-eyes-unconditionally-alive.png)
 
-Given a current policy/value network, MCTS spends extra test-time compute to produce a stronger move distribution. Training the policy to predict that distribution amortizes part of the search into the next network.
+## (00:39:03) — Why neural nets help
 
-![MCTS relabels trajectories with better local actions](/images/eric-jang-credit-assignment.svg)
+### Q1. In AlphaGo's MCTS, what does the value head $V_\theta(s)$ compute as a "shortcut for searching to the end of the tree"?
 
-### Q4. Why is MCTS not guaranteed to improve the raw policy early in training?
+$V_\theta(s) \approx \mathbb{E}[U \mid s]$, the expected terminal outcome of self-play continued from $s$ — one forward pass replaces an exponential-depth rollout the network never explicitly enumerates.
 
-The search is only as good as its ingredients. If the value estimates are wrong, terminal positions are underrepresented, or the number of simulations is too low, the backup process can propagate bad estimates and produce a worse policy distribution.
-
-## (02:11:13) — Connections to LLM reinforcement learning
-
-### Q1. What credit-assignment problem did Eric hit when he tried to train by imitating only winning trajectories?
-
-If two policies are near 50/50, a small excess of wins may be caused by one decisive move hidden among thousands of ordinary moves. Training on all winning moves overwhelms the useful signal with neutral labels.
-
-![Eric Jang drawing the credit-assignment analogy to LLM RL](/images/eric-jang-credit-assignment.jpg)
-
-### Q2. Why is AlphaGo's MCTS feedback richer than ordinary trajectory-level RL feedback?
-
-Trajectory-level RL asks, "Did this whole rollout win?" MCTS asks, at each state, "After local search, which action distribution looks better?" That turns sparse end-of-game feedback into much denser per-move supervision.
-
-### Q3. Why doesn't the AlphaGo recipe transfer directly to LLM reasoning?
-
-Go has a compact, simulatable action space and a useful value function for truncating search. LLM reasoning has an enormous open-ended action space and no equally reliable local simulator/value function for arbitrary thoughts.
-
-### Q4. What broader lesson does Eric draw from AlphaGo, AlphaFold, and similar systems?
-
-Worst-case search may be intractable, but real problem distributions often have exploitable structure. Neural networks can compress or amortize a surprising amount of simulation into a small number of forward-pass layers.
+![Why neural nets help](/images/eric-jang/value-function-as-amortized-search.png)

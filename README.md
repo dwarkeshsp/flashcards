@@ -1,154 +1,187 @@
 # Dwarkesh Podcast Flashcards
 
 Static site that hosts practice flashcards for technical Dwarkesh Podcast
-episodes. Built with Next.js 14 static export, Tailwind, and KaTeX.
+episodes. Cards are generated end-to-end by a Cursor SDK agent pipeline
+that fans out one Opus 4.7 worker per card, with web search and matplotlib
+visual tooling. Built with Next.js 14 static export, Tailwind, and KaTeX.
 
-Each episode lives at `/episodes/<slug>/` and has downloadable Markdown,
-JSON/TSV, transcript, and Anki exports under `public/exports/<slug>/`.
+Each episode lives at `/episodes/<slug>/` with its own Markdown, JSON/TSV,
+transcript, and Anki exports under `public/exports/<slug>/`.
 
 ## Local development
 
 ```bash
 npm install
-npm run dev
-# http://localhost:3000
+npm run dev    # http://localhost:3000
 ```
 
-## Editing flashcards
+## The agent pipeline
 
-Canonical cards live in [`lib/episodes/`](./lib/episodes/). Register an episode
-in [`lib/episodes/index.ts`](./lib/episodes/index.ts) to publish it on the site.
-Each `q` and `a` is a markdown string; `$inline$` and `$$block$$` LaTeX are
-rendered with KaTeX.
+The pipeline is in `scripts/pipeline/`. It is the thing you run when an
+episode airs — it produces a card deck plus per-card visuals, no human
+authoring required.
 
-After edits, regenerate the export files:
+### Architecture
+
+```
+manifest.json                                        ┌────────────────────┐
+   │                                                 │   open-websearch   │
+   ▼                                                 │   MCP server       │
+┌──────────────┐  10 concepts   ┌─────────────────┐  │ (no API key)       │
+│   planner    │ ─────────────▶ │ N card workers  │ ◀┘
+│ Opus 4.7     │   plan.json     │ Opus 4.7 each   │
+│ + websearch  │                 │ + websearch     │
+└──────────────┘                 │ + Python venv   │
+                                 │ + ffmpeg        │
+                                 └────────┬────────┘
+                                          │ writes card.json
+                                          │ + visual.png
+                                          ▼
+                                 ┌─────────────────┐
+                                 │   fresh critic  │   T0/T1/T2/T3 grade
+                                 │   Opus 4.7      │   per Memory Machines
+                                 └────────┬────────┘
+                                          │ if rewrite/polish
+                                          ▼
+                                 ┌─────────────────┐
+                                 │   writer revise │
+                                 │ (durable agent) │
+                                 └────────┬────────┘
+                                          ▼
+                              promote → lib/episodes/<slug>.ts
+                                          + public/images/<slug>/
+                                          + public/exports/<slug>/
+```
+
+Concretely:
+
+- **Planner** (`scripts/pipeline/run.ts::planConcepts`): one Opus 4.7
+  agent reads the full transcript and proposes ~10 card concepts as
+  JSON. Survives a Memory Machines / Andy Matuschak rubric: focused,
+  precise, consistent, tractable, effortful, source-anchored, T2/T3.
+- **Card worker** (`runCardWorker`): one durable Opus 4.7 agent per
+  card, running in parallel with bounded concurrency (default 4). Each
+  worker has filesystem access, shell, ffmpeg, the matplotlib venv at
+  `.agent-venv/bin/python3`, and the `open-websearch` MCP server for
+  fact-checking. It reads `scripts/pipeline/visual-guide.md`, writes
+  `card.json` plus an optional reconstructed `visual.png`, and saves
+  `make_visual.py` so the image is reproducible.
+- **Critic** (`criticPass`): a fresh stateless Opus 4.7 call per pass,
+  with no shared context with the writer. Grades T0–T3, may suggest a
+  rewrite. Same MCP servers available so it can verify factual claims.
+- **Reviser**: the durable writer agent gets the critique back and
+  decides whether to update its files. Workers are encouraged to push
+  back on weak criticism in `notes` rather than blindly defer.
+- **Promotion** (`promote`): assembles `lib/episodes/<slug>.ts` from the
+  records, copies visuals into `public/images/<slug>/`, and registers
+  the episode in `lib/episodes/generated.ts`.
+
+### Run it
+
+Set `CURSOR_API_KEY` (and ensure Node 18+ is installed). The pipeline
+expects the project Python venv at `.agent-venv/` with matplotlib
+installed:
 
 ```bash
-npm run export-files  # writes public/exports/<slug>/flashcards.{md,tsv,json} + transcript.md
-npm run build-anki    # writes public/exports/<slug>/flashcards.apkg
+python3 -m venv .agent-venv
+.agent-venv/bin/pip install matplotlib pillow
 ```
 
-(The Python script needs `genanki`: `python3 -m pip install --user genanki`.)
-
-The dev server picks up `lib/episodes/*` changes via hot reload, but you must
-rerun the two commands above for the downloadable exports to update.
-
-## Agent-assisted drafts
-
-The offline agent pipeline drafts candidate cards without changing the canonical
-episode files. It writes review artifacts under `.agent-flashcards/<slug>/<run>/`
-so the first pass can be judged before anything enters `lib/episodes/*`.
-
-1. Create a manifest JSON. See `scripts/agent-flashcards.manifest.example.json`
-   or the checked-in drafts under `scripts/agent-flashcards.manifests/`.
-2. Set a Cursor API key:
-
-   ```bash
-   export CURSOR_API_KEY="cursor_..."
-   ```
-
-3. Run the pipeline:
-
-   ```bash
-   npm run agent:flashcards -- --manifest scripts/agent-flashcards.manifest.example.json
-   ```
-
-The script uses one durable episode agent for transcript understanding, interest
-selection, and card drafting, then fresh stateless critic calls for T0-T3 review.
-The main output to inspect is `review.md`; `review.json` preserves the structured
-data for later promotion tooling. Artifact shapes are documented in
-`scripts/agent-flashcards.schema.json`.
-
-For the Eric Jang demo, the checked-in manifest is:
+Then:
 
 ```bash
-npm run agent:flashcards -- --manifest scripts/agent-flashcards.manifests/eric-jang.json --model gpt-5.5
+npm run pipeline -- --manifest scripts/pipeline-manifests/eric-jang.json
 ```
 
-Long runs can be resumed from a partial artifact directory:
+Each run writes everything to
+`.agent-flashcards/<slug>/<timestamp>/`:
+
+- `plan.json` — planner output
+- `cards/<id>/card.json` — final card
+- `cards/<id>/visual.png` — generated visual (if any)
+- `cards/<id>/make_visual.py` — script that produced the visual
+- `cards/<id>/critique-1.json` — fresh critic verdict
+- `cards/<id>/raw-*.txt` — raw agent transcripts for debugging
+- `cards/<id>/record.json` — combined record promoted into the deck
+
+`--max-cards N` caps how many concepts the workers run; `--resume-run-dir
+<path>` reuses an existing run directory.
+
+After the pipeline finishes, regenerate the static exports:
 
 ```bash
-npm run agent:flashcards -- --resume-run-dir .agent-flashcards/<slug>/<run>
+npm run export-files   # public/exports/<slug>/flashcards.{md,tsv,json}
+npm run build-anki     # public/exports/<slug>/flashcards.apkg
 ```
 
-To review every generated run from one local UI:
+`build-anki` looks for image media in `public/images/<slug>/` first,
+then `public/images/`, so per-episode generated visuals get embedded
+into the .apkg automatically.
 
-```bash
-npm run agent:review
+### Manifest format
+
+```jsonc
+{
+  "slug": "eric-jang",
+  "title": "Eric Jang on AlphaGo and AlphaZero",
+  "guest": "Eric Jang",
+  "blurb": "...",
+  "date": "2026-05-08",
+  "transcriptPath": "transcripts/eric-jang.md",
+  "videoPath": "Eric Jang 5-7.mp4",
+  "model": "claude-opus-4-7",
+  "targetCards": 10,
+  "concurrency": 4,
+  "criticPasses": 1,
+  "note": "Banner shown on the episode page."
+}
 ```
 
-This opens `http://localhost:8765` and scans all
-`.agent-flashcards/**/review.json` files. The workbench shows source excerpts,
-candidate cards, critic notes, and saved decisions. If `CURSOR_API_KEY` is set
-and the run has an `agent.json`, the "Rewrite with feedback" action resumes the
-durable episode agent, writes the rewrite under `rewrites/`, and runs a fresh
-critic pass on the revised card.
+### Visual style
 
-After review, promote accepted / edited / rewritten cards into a draft episode
-module:
+`scripts/pipeline/visual-guide.md` is the contract every worker reads
+before drawing. Visuals must match the house style established by
+`public/images/{latency-vs-batch.png, cost-vs-context.png,
+pipeline-bubbles.png}`: off-cream `#fafaf7` background, blue/orange/brown
+accents, sans-serif labels, axis arrows, slightly hand-drawn feel.
+Workers are explicitly forbidden from saving raw video screenshots as
+the card visual — they must reconstruct the diagram.
 
-```bash
-npm run agent:promote -- --run-dir .agent-flashcards/<slug>/<run>
-```
+### Manual editing
 
-The promotion step writes `lib/episodes/<slug>.generated.ts` by default. Review
-that file before registering it in `lib/episodes/index.ts`; pass `--register`
-only when you want the script to do that registration automatically.
+Built-in episodes live in `lib/episodes/` and are imported directly.
+Pipeline-generated episodes are written into per-episode files
+(`lib/episodes/<slug>.ts`) and then registered via
+`lib/episodes/generated.ts`. To hand-tune a generated card, edit the
+generated file directly; the pipeline will overwrite it on the next
+run.
+
+## Directory layout
+
+| Path | What it is |
+| --- | --- |
+| `lib/episodes/` | Source of truth for canonical episode decks |
+| `lib/episodes/index.ts` | Episode registry and display order |
+| `lib/episodes/generated.ts` | Auto-written list of pipeline-generated episodes |
+| `app/page.tsx` | Episode index |
+| `app/episodes/[slug]/page.tsx` | Episode flashcard page |
+| `components/` | UI building blocks |
+| `public/images/` | Diagrams used inside answers |
+| `public/images/<slug>/` | Per-episode generated diagrams |
+| `public/exports/<slug>/` | Generated `.apkg`, `.md`, `.tsv`, `.json`, `transcript.md` |
+| `scripts/pipeline/` | Cursor SDK agent pipeline |
+| `scripts/pipeline-manifests/` | Per-episode manifests |
+| `scripts/export-files.ts` | Regenerates the markdown / tsv / json exports |
+| `scripts/build_anki.py` | Regenerates the .apkg from the JSON dump |
+| `.agent-flashcards/` | Per-run artifact directory (gitignored) |
 
 ## Deploying
 
-Static export goes to `out/`. Drop it on any host:
-
-### Vercel (one click)
-
-```bash
-npx vercel deploy --prod
-```
-
-Vercel auto-detects Next.js and runs `npm run build`.
-
-### Anywhere else (GitHub Pages, Netlify, Cloudflare Pages, S3, …)
-
-```bash
-npm run build
-# upload everything in out/
-```
-
-## Files at a glance
-
-| Path                                | What it is                                            |
-| ----------------------------------- | ----------------------------------------------------- |
-| `lib/episodes/`                     | Source of truth for canonical episode decks           |
-| `lib/episodes/index.ts`             | Episode registry and display order                    |
-| `app/page.tsx`                      | Episode index                                         |
-| `app/episodes/[slug]/page.tsx`      | Episode flashcard page                                |
-| `components/`                       | UI building blocks                                    |
-| `public/images/`                    | Diagrams used inside answers                          |
-| `public/exports/<slug>/flashcards.apkg` | Anki deck (drag into Anki to import)              |
-| `public/exports/<slug>/flashcards.md`   | Clean markdown of all Q&A                         |
-| `public/exports/<slug>/flashcards.tsv`  | Tab-separated for Anki CSV import fallback        |
-| `public/exports/<slug>/flashcards.json` | JSON dump used by `build_anki.py`                 |
-| `public/exports/<slug>/transcript.md`   | Cleaned-up transcript                             |
-| `scripts/export-files.ts`           | Regenerates the markdown / tsv / json exports         |
-| `scripts/build_anki.py`             | Regenerates the .apkg from the JSON dump              |
-
-## Typo fixes applied vs. the original docx
-
-- Section 2 title: `across a GPU racks` → `across GPU racks` (also fixed in transcript export)
-- Section 1: `keen decreasing` → `keep decreasing`
-- Section 5: question said `500M tokens/sec`; the answer's math used `50M`. Fixed question to `50M tokens/sec` (matches the 200T tokens / 100× answer).
-- Section 5: normalized lowercase `x` → `×` in one equation.
-
-## Current demo
-
-The Eric Jang deck is wired into the site as a reviewable candidate deck:
-
-- canonical module: `lib/episodes/eric-jang.ts`
-- transcript: `transcripts/eric-jang.md`
-- media manifest: `content/episodes/eric-jang/media.json`
-- generated exports: `public/exports/eric-jang/`
-- generated visuals and video snapshots: `public/images/eric-jang-*`
+Static export goes to `out/`. `npx vercel deploy --prod` or upload `out/`
+to any static host.
 
 ## Credits
 
-Questions written by Dwarkesh Patel with Cursor-assisted drafts and review.
+Site by Dwarkesh Patel. Cards on this site are generated by Cursor SDK
+agents (Opus 4.7) with the Memory Machines / Andy Matuschak rubric, then
+spot-edited as needed.

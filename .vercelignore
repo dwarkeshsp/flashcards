@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+
+public/exports/*
+!public/exports/reiner-pope
+!public/exports/reiner-pope/**

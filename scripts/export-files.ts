@@ -1,7 +1,7 @@
 /**
  * Generates static export files served from /public/exports/<slug>/:
  *   - flashcards.md      Clean markdown of all Q&A
- *   - flashcards.tsv     Tab-separated for Anki import (fallback)
+ *   - flashcards.tsv     Two-column Q/A TSV for Anki import (fallback)
  *   - flashcards.json    JSON dump for the Python apkg builder
  *   - transcript.md      Cleaned-up transcript with typo fixes
  *
@@ -79,15 +79,12 @@ function mdToAnkiHtml(s: string): string {
 }
 
 function buildTsv(ep: Episode): string {
-  const rows = ['"Question"\t"Answer"\t"Tags"'];
-  const deckTag = ep.slug.replace(/[^a-zA-Z0-9]+/g, "_");
+  const rows = ['"Question"\t"Answer"'];
   for (const s of ep.sections) {
-    const tag = `${deckTag}::${s.id}`;
     s.cards.forEach((c) => {
       const q = `"${escapeAnkiField(mdToAnkiHtml(c.q))}"`;
       const a = `"${escapeAnkiField(mdToAnkiHtml(c.a))}"`;
-      const tags = `"${tag}"`;
-      rows.push(`${q}\t${a}\t${tags}`);
+      rows.push(`${q}\t${a}`);
     });
   }
   return rows.join("\n");

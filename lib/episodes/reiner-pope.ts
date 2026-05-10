@@ -11,7 +11,7 @@ export const reinerPope: Episode = {
   guest: "Reiner Pope",
   blurb:
     "Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.",
-  date: "2025-10",
+  date: "2026-04",
   youtubeUrl: "https://youtu.be/xmkSf5IS-zw",
   substackUrl: "https://www.dwarkesh.com/p/reiner-pope",
   transcriptPath: "transcripts/reiner-pope.md",
@@ -143,8 +143,8 @@ export const reinerPope: Episode = {
       title: "Deducing inference memory costs from API pricing",
       cards: [
         {
-          q: "Why does Gemini charge $\\sim 50\\%$ more for tokens above 200K context? At a high level, what's happening?",
-          a: "Below this point, you're compute bound, whose cost is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and that increases linearly with context length.",
+          q: "Why does Gemini charge ~ 50% more for tokens above 200K context? At a high level, what's happening?",
+          a: "Below this point, you're compute bound, where marginal cost per token is flat as context length increases.\n\nAbove this point, you're memory time bound, thanks to KV cache growing, and so marginal token cost increases linearly with context length.",
         },
         {
           q: "Sketch compute and memory time per token as context length increases. Then also sketch the pricing per token and how it changes at the crossover point.",

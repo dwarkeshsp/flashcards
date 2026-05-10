@@ -1,0 +1,14 @@
+{
+  "slug": "eric-jang",
+  "title": "Eric Jang on AlphaGo and AlphaZero",
+  "guest": "Eric Jang",
+  "blurb": "Practice questions for Eric Jang's blackboard lecture on building AlphaGo from scratch: Go, MCTS, policy and value networks, and how AlphaZero-style learning compares to LLM RL.",
+  "date": "2026-05-08",
+  "transcriptPath": "transcripts/eric-jang.md",
+  "videoPath": "Eric Jang 5-7.mp4",
+  "model": "claude-opus-4-7",
+  "targetCards": 10,
+  "concurrency": 4,
+  "criticPasses": 1,
+  "note": "Generated end-to-end by parallel Cursor SDK agents (Opus 4.7) with web search and matplotlib visual tooling. See scripts/pipeline/run.ts."
+}

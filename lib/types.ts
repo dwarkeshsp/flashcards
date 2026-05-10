@@ -13,7 +13,7 @@ export type Section = {
 };
 
 export type Episode = {
-  // URL slug: `/episodes/<slug>/`. Also used as Anki deck subfolder.
+  // URL slug: `/episodes/<slug>/`. Also used for per-episode export paths.
   slug: string;
   // Full title shown on the episode page header, e.g.
   // "Reiner Pope on the Dwarkesh Podcast".

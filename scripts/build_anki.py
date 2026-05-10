@@ -32,9 +32,9 @@ IMAGES_DIR = ROOT / "public" / "images"
 
 
 # Shared model (card template + CSS) — one model reused across all decks.
-# Bumping MODEL_ID would invalidate Anki cards already imported from prior
-# versions, so keep it stable.
-MODEL_ID = 2026042902
+# This ID changed when the Anki note schema was simplified to only
+# Question/Answer fields.
+MODEL_ID = 2026050801
 
 CSS = """
 .card {
@@ -47,15 +47,6 @@ CSS = """
   max-width: 720px;
   margin: 0 auto;
   padding: 24px;
-}
-.section-tag {
-  display: inline-block;
-  font-family: -apple-system, system-ui, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #8a8a8a;
-  margin-bottom: 16px;
 }
 .q {
   font-size: 19px;
@@ -109,7 +100,6 @@ def build_model() -> genanki.Model:
         MODEL_ID,
         "Dwarkesh Flashcard",
         fields=[
-            {"name": "Section"},
             {"name": "Question"},
             {"name": "Answer"},
         ],
@@ -117,11 +107,9 @@ def build_model() -> genanki.Model:
             {
                 "name": "Card 1",
                 "qfmt": (
-                    '<div class="section-tag">{{Section}}</div>'
                     '<div class="q">{{Question}}</div>'
                 ),
                 "afmt": (
-                    '<div class="section-tag">{{Section}}</div>'
                     '<div class="q">{{Question}}</div>'
                     '<hr id="answer">'
                     '<div class="a">{{Answer}}</div>'
@@ -141,26 +129,21 @@ def build_deck(data_file: Path, model: genanki.Model) -> tuple[Path, int, int]:
     deck = genanki.Deck(stable_deck_id(slug), deck_title)
 
     media: set[Path] = set()
-    deck_tag = re.sub(r"[^a-zA-Z0-9]+", "_", slug)
-
     for sec in data["sections"]:
-        section_label = (
-            f"{sec['timestamp']} — {sec['title']}" if sec.get("timestamp") else sec["title"]
-        )
-        section_tag = re.sub(r"[^a-zA-Z0-9]+", "_", sec["id"])
-        tag = f"{deck_tag}::{section_tag}"
         for card in sec["cards"]:
             q_html = card["question_html"]
             a_html = card["answer_html"]
             for src in find_referenced_images(a_html):
                 fname = Path(src).name
-                local = IMAGES_DIR / fname
-                if local.exists():
-                    media.add(local)
+                # Look in public/images/<slug>/ first (per-episode generated
+                # assets), then fall back to public/images/ (shared assets).
+                for candidate in (IMAGES_DIR / slug / fname, IMAGES_DIR / fname):
+                    if candidate.exists():
+                        media.add(candidate)
+                        break
             note = genanki.Note(
                 model=model,
-                fields=[section_label, q_html, a_html],
-                tags=[tag],
+                fields=[q_html, a_html],
             )
             deck.add_note(note)
 

@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Dwarkesh Podcast Flashcards",
   description:
-    "Practice questions for technical episodes of the Dwarkesh Podcast. One deck per guest — click-to-reveal online or download as Anki / Markdown.",
+    "Practice questions for technical episodes of the Dwarkesh Podcast.",
   openGraph: {
     title: "Dwarkesh Podcast Flashcards",
     description:
