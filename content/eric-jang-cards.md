@@ -84,6 +84,8 @@ timestamp: 00:42:04
 - Policy head prunes breadth. $P(a \mid s)$ goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.
 - Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree.
 
+![Two heads, two cuts](/images/eric-jang/breadth-depth-tree.png)
+
 ---
 
 # Section: Why have a policy head if you already have a value head
@@ -111,6 +113,8 @@ timestamp: 00:44:14
 - Expand. Run the neural network on that leaf state once. It returns priors over the leaf's legal moves and a value estimate of who's winning from there.
 - Back up. Walk back up to the root. On every edge you descended through, increment its visit count and fold the new leaf value into its running average.
 
+![One MCTS simulation](/images/eric-jang/mcts-three-steps.png)
+
 ---
 
 # Section: PUCT — explore vs exploit, and what lives where
@@ -130,6 +134,8 @@ Unvisited children have a tiny denominator (just $1$), so their explore term is 
 The prior $P(s,a)$ sets the order: high-prior moves get the biggest bonus and are tried first, low-prior moves later.
 
 Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node when you have visited it more.
+
+![PUCT explore vs exploit dominance shift](/images/eric-jang/puct-dominance-shift.png)
 
 ---
 
@@ -166,6 +172,8 @@ timestamp: 01:18:14
 
 MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
 
+![Winner-imitation buried in neutral labels vs MCTS dense supervision](/images/eric-jang/winner-imitation-dilution.png)
+
 ---
 
 # Section: MCTS and NFSP — same student, opposite time-directions
@@ -195,6 +203,8 @@ timestamp: 02:25:20
 
 - Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.
 - Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you.
+
+![Why MCTS doesn't transfer from Go to LLMs](/images/eric-jang/mcts-go-vs-llm.png)
 
 ---
 

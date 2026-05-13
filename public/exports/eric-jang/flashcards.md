@@ -40,6 +40,8 @@ $$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value:
 - Policy head prunes breadth. $P(a \mid s)$ goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.
 - Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree.
 
+![Two heads, two cuts](/images/eric-jang/breadth-depth-tree.png)
+
 ### Q6. Couldn't we drop the policy head and pick $a^* = \arg\max_a V_\theta(s')$ over the resulting next states $s'$? Why is that a bad idea? Two reasons:
 
 - To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.
@@ -50,6 +52,8 @@ $$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value:
 - Descend. Walk down from the root, at each node picking the child whose PUCT score is highest.
 - Expand. Run the neural network on that leaf state once. It returns priors over the leaf's legal moves and a value estimate of who's winning from there.
 - Back up. Walk back up to the root. On every edge you descended through, increment its visit count and fold the new leaf value into its running average.
+
+![One MCTS simulation](/images/eric-jang/mcts-three-steps.png)
 
 ### Q8. As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:
 
@@ -62,6 +66,8 @@ Unvisited children have a tiny denominator (just $1$), so their explore term is 
 The prior $P(s,a)$ sets the order: high-prior moves get the biggest bonus and are tried first, low-prior moves later.
 
 Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node when you have visited it more.
+
+![PUCT explore vs exploit dominance shift](/images/eric-jang/puct-dominance-shift.png)
 
 ### Q9. Of the four search-time quantities in PUCT — $Q(s,a)$, $P(s,a)$, $N(s)$, $N(s,a)$ — which is produced by the neural network and which live in the MCTS tree node?
 
@@ -80,6 +86,8 @@ Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe 
 
 MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
 
+![Winner-imitation buried in neutral labels vs MCTS dense supervision](/images/eric-jang/winner-imitation-dilution.png)
+
 ### Q12. Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?
 
 - NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*. Teacher = greedy $a$ from learned $Q$.
@@ -93,6 +101,8 @@ From the student's perspective the supervision is identical — the teacher's ti
 
 - Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.
 - Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you.
+
+![Why MCTS doesn't transfer from Go to LLMs](/images/eric-jang/mcts-go-vs-llm.png)
 
 ### Q14. AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?
 

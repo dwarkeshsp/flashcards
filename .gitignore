@@ -9,3 +9,4 @@ extracted_docx
 .agent-flashcards
 .agent-venv
 tsconfig.tsbuildinfo
+scripts/__pycache__/
