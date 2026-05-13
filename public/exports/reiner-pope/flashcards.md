@@ -1,10 +1,10 @@
-# Reiner Pope on the Dwarkesh Podcast
+# Reiner Pope
 
 - YouTube: https://youtu.be/xmkSf5IS-zw
 - Substack: https://www.dwarkesh.com/p/reiner-pope
 - Total cards: 27
 
-Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.
+The math behind how LLMs are trained and served
 
 ---
 

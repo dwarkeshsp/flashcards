@@ -13,7 +13,7 @@ export default function Page() {
             Dwarkesh Podcast Flashcards
           </h1>
           <p className="mt-5 max-w-prose text-[1.0625rem] leading-relaxed text-ink-muted">
-            Practice questions for technical episodes of the Dwarkesh Podcast.
+            Flashcards for blackboard lectures of the Dwarkesh Podcast.
           </p>
         </header>
 
@@ -24,7 +24,7 @@ export default function Page() {
             return (
               <li key={ep.slug}>
                 <Link
-                  href={`/episodes/${ep.slug}/`}
+                  href={`/${ep.slug}/`}
                   className="group block rounded-lg border border-rule bg-white/40 px-6 py-6 transition-all duration-150 hover:-translate-y-0.5 hover:border-ink/25 hover:bg-white hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] sm:px-7 sm:py-7"
                 >
                   <div className="flex items-start justify-between gap-5">

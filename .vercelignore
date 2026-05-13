@@ -10,3 +10,5 @@ out
 public/exports/*
 !public/exports/reiner-pope
 !public/exports/reiner-pope/**
+!public/exports/eric-jang
+!public/exports/eric-jang/**

@@ -1,141 +1,108 @@
 {
   "meta": {
     "slug": "eric-jang",
-    "title": "Eric Jang on AlphaGo and AlphaZero",
+    "title": "Eric Jang",
     "guest": "Eric Jang",
-    "blurb": "Practice questions for Eric Jang's blackboard lecture on building AlphaGo from scratch: Go, MCTS, policy and value networks, and how AlphaZero-style learning compares to LLM RL.",
+    "blurb": "Building AlphaGo from scratch",
     "date": "2026-05-08",
     "youtube": null,
     "substack": null
   },
   "sections": [
     {
-      "id": "why-alphago-s-rl-is-elegant",
-      "timestamp": "01:02:31",
-      "title": "Why AlphaGo's RL is elegant",
+      "id": "all",
+      "timestamp": null,
+      "title": "All cards",
       "cards": [
         {
-          "question_md": "Why does AlphaGo's training avoid the sparse-reward exploration problem that LLM RL has to solve?",
-          "answer_md": "Because **MCTS run on top of the current policy net $\\pi_\\theta$ is a policy-improvement operator**: its visit-count distribution is (typically) a strictly better policy than $\\pi_\\theta$ itself. So $\\pi_\\theta$ is just trained to imitate the MCTS distribution — supervised learning on *improved labels*, with no need to first achieve a non-zero success rate by random exploration.\n\n![Why AlphaGo's RL is elegant](/images/eric-jang/alphago-bypasses-sparse-rl.png)",
-          "question_html": "Why does AlphaGo's training avoid the sparse-reward exploration problem that LLM RL has to solve?",
-          "answer_html": "Because <b>MCTS run on top of the current policy net \\(\\pi_\\theta\\) is a policy-improvement operator</b>: its visit-count distribution is (typically) a strictly better policy than \\(\\pi_\\theta\\) itself. So \\(\\pi_\\theta\\) is just trained to imitate the MCTS distribution — supervised learning on <i>improved labels</i>, with no need to first achieve a non-zero success rate by random exploration.\n\n<img src=\"alphago-bypasses-sparse-rl.png\" alt=\"Why AlphaGo's RL is elegant\">"
-        }
-      ]
-    },
-    {
-      "id": "self-play-as-policy-improvement",
-      "timestamp": "01:07",
-      "title": "Self-play as policy improvement",
-      "cards": [
+          "question_md": "What is the overall purpose of the AlphaGo neural network in the full program?",
+          "answer_md": "To guide and prune the MCTS search.",
+          "question_html": "What is the overall purpose of the AlphaGo neural network in the full program?",
+          "answer_html": "To guide and prune the MCTS search."
+        },
         {
-          "question_md": "In AlphaGo's self-play loop, every position's MCTS visit distribution is used as a supervised label for the policy net. On a test-time-scaling plot (x = num MCTS simulations, y = win rate), what does this distillation step do to the curve from iteration $k$ to iteration $k{+}1$, and why?",
-          "answer_md": "Iter $k{+}1$'s curve **starts where iter $k$'s curve ended after $N$ simulations.** Distilling the visit distribution amortizes those $N$ sims of search into the policy weights, so the new \"shoot-from-the-hip\" net plays at iter $k$'s post-search level for free.\n\n![Self-play as policy improvement](/images/eric-jang/mcts-distillation-amortization.png)",
-          "question_html": "In AlphaGo's self-play loop, every position's MCTS visit distribution is used as a supervised label for the policy net. On a test-time-scaling plot (x = num MCTS simulations, y = win rate), what does this distillation step do to the curve from iteration \\(k\\) to iteration \\(k{+}1\\), and why?",
-          "answer_html": "Iter \\(k{+}1\\)'s curve <b>starts where iter \\(k\\)'s curve ended after \\(N\\) simulations.</b> Distilling the visit distribution amortizes those \\(N\\) sims of search into the policy weights, so the new \"shoot-from-the-hip\" net plays at iter \\(k\\)'s post-search level for free.\n\n<img src=\"mcts-distillation-amortization.png\" alt=\"Self-play as policy improvement\">"
-        }
-      ]
-    },
-    {
-      "id": "why-mcts-hasn-t-taken-over-llms",
-      "timestamp": "02:47:00",
-      "title": "Why MCTS hasn't taken over LLMs",
-      "cards": [
+          "question_md": "The AlphaGo network takes in \\_\\_\\_ and outputs both \\_\\_\\_ and \\_\\_\\_.",
+          "answer_md": "- Input: the current board state.\n- Outputs: a policy — a probability distribution over the legal moves — and a value — the probability the current player will win.\n\n![AlphaGo network as MCTS guide](/images/eric-jang/network-schematic.png)",
+          "question_html": "The AlphaGo network takes in \\_\\_\\_ and outputs both \\_\\_\\_ and \\_\\_\\_.",
+          "answer_html": "• Input: the current board state.\n• Outputs: a policy — a probability distribution over the legal moves — and a value — the probability the current player will win.\n\n<img src=\"network-schematic.png\" alt=\"AlphaGo network as MCTS guide\">"
+        },
         {
-          "question_md": "AlphaGo's PUCT action selection uses the exploration bonus $C_{\\text{PUCT}}\\,P(a)\\,\\dfrac{\\sqrt{N}}{1+N_a}$. Why does this term stop guiding search when MCTS is applied over an LLM's ~100k-token vocabulary?",
-          "answer_md": "Because you essentially **never sample the same child token more than once**. Across a ~100k-vocab branching factor, $N_a$ stays at 0 (or 1) for almost every action, so the $\\sqrt{N}/(1+N_a)$ ratio collapses to roughly the same value everywhere — the \"have I tried this child enough times?\" signal that PUCT is built around no longer discriminates between actions. The heuristic was designed for Go's ≤361 actions, where the same child is revisited many times per node; that assumption is what breaks for language.\n\n![Why MCTS hasn't taken over LLMs](/images/eric-jang/mcts-fails-on-llms.png)",
-          "question_html": "AlphaGo's PUCT action selection uses the exploration bonus \\(C_{\\text{PUCT}}\\,P(a)\\,\\dfrac{\\sqrt{N}}{1+N_a}\\). Why does this term stop guiding search when MCTS is applied over an LLM's ~100k-token vocabulary?",
-          "answer_html": "Because you essentially <b>never sample the same child token more than once</b>. Across a ~100k-vocab branching factor, \\(N_a\\) stays at 0 (or 1) for almost every action, so the \\(\\sqrt{N}/(1+N_a)\\) ratio collapses to roughly the same value everywhere — the \"have I tried this child enough times?\" signal that PUCT is built around no longer discriminates between actions. The heuristic was designed for Go's ≤361 actions, where the same child is revisited many times per node; that assumption is what breaks for language.\n\n<img src=\"mcts-fails-on-llms.png\" alt=\"Why MCTS hasn't taken over LLMs\">"
-        }
-      ]
-    },
-    {
-      "id": "mcts-algorithm",
-      "timestamp": "01:30:00",
-      "title": "MCTS algorithm",
-      "cards": [
+          "question_md": "We update the AlphaGo network with per-move training labels. What are these labels?",
+          "answer_md": "- For the policy head: the final MCTS visit distribution at that move.\n- For the value head: who won the game, projected (with appropriate sign flips for self-play) back through every move.",
+          "question_html": "We update the AlphaGo network with per-move training labels. What are these labels?",
+          "answer_html": "• For the policy head: the final MCTS visit distribution at that move.\n• For the value head: who won the game, projected (with appropriate sign flips for self-play) back through every move."
+        },
         {
-          "question_md": "In AlphaGo's MCTS, name the four phases of a single simulation, **in order**.",
-          "answer_md": "**select → expand → evaluate → backup**\n\n![MCTS algorithm](/images/eric-jang/mcts-four-steps.png)",
-          "question_html": "In AlphaGo's MCTS, name the four phases of a single simulation, <b>in order</b>.",
-          "answer_html": "<b>select → expand → evaluate → backup</b>\n\n<img src=\"mcts-four-steps.png\" alt=\"MCTS algorithm\">"
-        }
-      ]
-    },
-    {
-      "id": "why-naive-self-play-stalls",
-      "timestamp": "01:22:50",
-      "title": "Why naive self-play stalls",
-      "cards": [
+          "question_md": "The AlphaZero loss is composed of two quantities. What are they conceptually, and mathematically?",
+          "answer_md": "Conceptually:\n1. Make the value head predict who actually won.\n2. Make the policy head predict the MCTS visit distribution at that state.\n\nMathematically, summed over states visited in self-play:\n\n$$\\mathcal{L}(\\theta) \\;=\\; \\underbrace{\\bigl(V_\\theta(s) - z\\bigr)^2}_{\\text{value: MSE vs game outcome } z\\in\\{-1,+1\\}} \\;+\\; \\underbrace{-\\,\\boldsymbol{\\pi}_{\\text{MCTS}}(s)^{\\top}\\log P_\\theta(\\cdot\\mid s)}_{\\text{policy: cross-entropy vs MCTS visit distribution}}.$$",
+          "question_html": "The AlphaZero loss is composed of two quantities. What are they conceptually, and mathematically?",
+          "answer_html": "Conceptually:\n1. Make the value head predict who actually won.\n2. Make the policy head predict the MCTS visit distribution at that state.\n\nMathematically, summed over states visited in self-play:\n\n\\[\\mathcal{L}(\\theta) \\;=\\; \\underbrace{\\bigl(V_\\theta(s) - z\\bigr)^2}_{\\text{value: MSE vs game outcome } z\\in\\{-1,+1\\}} \\;+\\; \\underbrace{-\\,\\boldsymbol{\\pi}_{\\text{MCTS}}(s)^{\\top}\\log P_\\theta(\\cdot\\mid s)}_{\\text{policy: cross-entropy vs MCTS visit distribution}}.\\]"
+        },
         {
-          "question_md": "Eric implements a self-play loop against KataGo where, after MCTS rollouts, he supervises the policy on the moves of *winning* games (REINFORCE-style, with the win/lose indicator as the weight). It plateaus at ~50%. He attributes the failure to a single quantitative scaling law on the policy gradient. **What is that scaling, and where does the extra factor of $T$ come from?**",
-          "answer_md": "$$\\mathrm{Var}\\!\\left[\\nabla_{\\!\\theta}\\,\\mathcal{L}\\right]\\;\\propto\\;T^{2}$$\n\nin the episode length $T$. The extra factor of $T$ (vs the $\\sim T$ you'd get from independent samples) comes from the fact that the per-step log-probs are produced by **the same policy across time**, so the actions are correlated; squaring the sum-over-time inside the variance picks up $\\sim T^{2}$ cross-terms. For Go, $T \\approx 150$ moves per side, so any single decisive move is buried under noise from the many neutral moves and the gradient carries no usable signal.\n\n![Why naive self-play stalls](/images/eric-jang/naive-winner-imitation-fails.png)",
-          "question_html": "Eric implements a self-play loop against KataGo where, after MCTS rollouts, he supervises the policy on the moves of <i>winning</i> games (REINFORCE-style, with the win/lose indicator as the weight). It plateaus at ~50%. He attributes the failure to a single quantitative scaling law on the policy gradient. <b>What is that scaling, and where does the extra factor of \\(T\\) come from?</b>",
-          "answer_html": "\\[\\mathrm{Var}\\!\\left[\\nabla_{\\!\\theta}\\,\\mathcal{L}\\right]\\;\\propto\\;T^{2}\\]\n\nin the episode length \\(T\\). The extra factor of \\(T\\) (vs the \\(\\sim T\\) you'd get from independent samples) comes from the fact that the per-step log-probs are produced by <b>the same policy across time</b>, so the actions are correlated; squaring the sum-over-time inside the variance picks up \\(\\sim T^{2}\\) cross-terms. For Go, \\(T \\approx 150\\) moves per side, so any single decisive move is buried under noise from the many neutral moves and the gradient carries no usable signal.\n\n<img src=\"naive-winner-imitation-fails.png\" alt=\"Why naive self-play stalls\">"
-        }
-      ]
-    },
-    {
-      "id": "action-selection-inside-mcts",
-      "timestamp": "00:29:48",
-      "title": "Action selection inside MCTS",
-      "cards": [
+          "question_md": "If there are up to ~361 legal moves per turn and a Go game can last ~300 turns, the naive game tree has on the order of $361^{300}$ trajectories. Which axis does the policy head prune, and which does the value head prune?",
+          "answer_md": "- Policy head prunes breadth. $P(a \\mid s)$ goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.\n- Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree.",
+          "question_html": "If there are up to ~361 legal moves per turn and a Go game can last ~300 turns, the naive game tree has on the order of \\(361^{300}\\) trajectories. Which axis does the policy head prune, and which does the value head prune?",
+          "answer_html": "• Policy head prunes breadth. \\(P(a \\mid s)\\) goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.\n• Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree."
+        },
         {
-          "question_md": "Write AlphaGo's **PUCT** rule for picking which child to descend into during MCTS, and label what each of its four pieces — $Q(s,a)$, $c_{\\mathrm{PUCT}}$, $P(a)$, and $\\sqrt{N}/(1+N_a)$ — contributes.",
-          "answer_md": "$$a^{\\star} \\;=\\; \\arg\\max_{a}\\;\\Bigl[\\,Q(s,a)\\;+\\;c_{\\mathrm{PUCT}}\\,P(a)\\,\\frac{\\sqrt{N}}{1+N_a}\\,\\Bigr]$$\n\n- $Q(s,a)$ — **exploit**: mean action value of this child (avg result of rollouts that have gone through it).\n- $c_{\\mathrm{PUCT}}$ — **exploration weight**: tuning constant trading exploit vs exploration.\n- $P(a)$ — **policy prior** from the network: steers exploration toward moves the policy thinks are strong.\n- $\\dfrac{\\sqrt{N}}{1+N_a}$ — **visit-count bonus**: huge when $N_a=0$, decays as that child is sampled, so under-tried children get pulled in.\n\n($N$ = parent's total visits; $N_a$ = visits to this specific child.)\n\n![Action selection inside MCTS](/images/eric-jang/puct-selection-rule.png)",
-          "question_html": "Write AlphaGo's <b>PUCT</b> rule for picking which child to descend into during MCTS, and label what each of its four pieces — \\(Q(s,a)\\), \\(c_{\\mathrm{PUCT}}\\), \\(P(a)\\), and \\(\\sqrt{N}/(1+N_a)\\) — contributes.",
-          "answer_html": "\\[a^{\\star} \\;=\\; \\arg\\max_{a}\\;\\Bigl[\\,Q(s,a)\\;+\\;c_{\\mathrm{PUCT}}\\,P(a)\\,\\frac{\\sqrt{N}}{1+N_a}\\,\\Bigr]\\]\n\n• \\(Q(s,a)\\) — <b>exploit</b>: mean action value of this child (avg result of rollouts that have gone through it).\n• \\(c_{\\mathrm{PUCT}}\\) — <b>exploration weight</b>: tuning constant trading exploit vs exploration.\n• \\(P(a)\\) — <b>policy prior</b> from the network: steers exploration toward moves the policy thinks are strong.\n• \\(\\dfrac{\\sqrt{N}}{1+N_a}\\) — <b>visit-count bonus</b>: huge when \\(N_a=0\\), decays as that child is sampled, so under-tried children get pulled in.\n\n(\\(N\\) = parent's total visits; \\(N_a\\) = visits to this specific child.)\n\n<img src=\"puct-selection-rule.png\" alt=\"Action selection inside MCTS\">"
-        }
-      ]
-    },
-    {
-      "id": "rl-vs-supervised-learning-information-rate",
-      "timestamp": "03:28:00",
-      "title": "RL vs supervised learning information rate",
-      "cards": [
+          "question_md": "Couldn't we drop the policy head and pick $a^* = \\arg\\max_a V_\\theta(s')$ over the resulting next states $s'$? Why is that a bad idea? Two reasons:",
+          "answer_md": "- To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.\n- You can't easily turn MCTS into a single scalar, and the whole point of training is to distill the MCTS search into the model.",
+          "question_html": "Couldn't we drop the policy head and pick \\(a^* = \\arg\\max_a V_\\theta(s')\\) over the resulting next states \\(s'\\)? Why is that a bad idea? Two reasons:",
+          "answer_html": "• To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.\n• You can't easily turn MCTS into a single scalar, and the whole point of training is to distill the MCTS search into the model."
+        },
         {
-          "question_md": "If your policy's pass rate on a token (or trajectory) is $p$, how many bits per sample does cross-entropy supervised learning extract, and how many does naive binary-reward RL extract? What does each do as $p \\to 0$?",
-          "answer_md": "- **SL (cross-entropy on the labeled token):** $-\\log p$ bits per sample, deterministic given the label. Diverges to $\\infty$ as $p \\to 0$ — every miss tells you exactly how far the predicted distribution sits from the label.\n- **RL (binary success/failure):** $H(p) = -p\\log p - (1-p)\\log(1-p)$ expected bits per sample, averaged over the Bernoulli outcome. Peaks at $1$ bit when $p = 1/2$ (a coin flip), and collapses to $0$ as $p \\to 0$ or $p \\to 1$.\n\nSo a cold policy (tiny $p$) keeps getting unbounded SL signal but a vanishing expected RL signal — \"supervision through a straw.\"\n\n![RL vs supervised learning information rate](/images/eric-jang/supervised-vs-rl-bits-per-sample.png)",
-          "question_html": "If your policy's pass rate on a token (or trajectory) is \\(p\\), how many bits per sample does cross-entropy supervised learning extract, and how many does naive binary-reward RL extract? What does each do as \\(p \\to 0\\)?",
-          "answer_html": "• <b>SL (cross-entropy on the labeled token):</b> \\(-\\log p\\) bits per sample, deterministic given the label. Diverges to \\(\\infty\\) as \\(p \\to 0\\) — every miss tells you exactly how far the predicted distribution sits from the label.\n• <b>RL (binary success/failure):</b> \\(H(p) = -p\\log p - (1-p)\\log(1-p)\\) expected bits per sample, averaged over the Bernoulli outcome. Peaks at \\(1\\) bit when \\(p = 1/2\\) (a coin flip), and collapses to \\(0\\) as \\(p \\to 0\\) or \\(p \\to 1\\).\n\nSo a cold policy (tiny \\(p\\)) keeps getting unbounded SL signal but a vanishing expected RL signal — \"supervision through a straw.\"\n\n<img src=\"supervised-vs-rl-bits-per-sample.png\" alt=\"RL vs supervised learning information rate\">"
-        }
-      ]
-    },
-    {
-      "id": "computer-go-scoring",
-      "timestamp": "00:13:59",
-      "title": "Computer Go scoring",
-      "cards": [
+          "question_md": "During inference, is anything about the MCTS search preserved between moves?",
+          "answer_md": "No — the tree is discarded and rebuilt from scratch each move.",
+          "question_html": "During inference, is anything about the MCTS search preserved between moves?",
+          "answer_html": "No — the tree is discarded and rebuilt from scratch each move."
+        },
         {
-          "question_md": "Why do Go AIs train and resolve games under **Tromp-Taylor** rules instead of standard human (e.g. Chinese) rules?",
-          "answer_md": "Tromp-Taylor scoring is **fully algorithmic** — it removes the human \"agree this group is dead\" consensus step.\n\n- Human rules require both players to agree which stones are dead before counting; if they disagree, they keep playing.\n- Tromp-Taylor instead forces play to the **bitter end**: every contested stone has to actually be captured on the board, so the winner is decidable by code with no human-in-the-loop — safe to optimize against in self-play.",
-          "question_html": "Why do Go AIs train and resolve games under <b>Tromp-Taylor</b> rules instead of standard human (e.g. Chinese) rules?",
-          "answer_html": "Tromp-Taylor scoring is <b>fully algorithmic</b> — it removes the human \"agree this group is dead\" consensus step.\n\n• Human rules require both players to agree which stones are dead before counting; if they disagree, they keep playing.\n• Tromp-Taylor instead forces play to the <b>bitter end</b>: every contested stone has to actually be captured on the board, so the winner is decidable by code with no human-in-the-loop — safe to optimize against in self-play."
-        }
-      ]
-    },
-    {
-      "id": "go-fundamentals",
-      "timestamp": "00:09:48",
-      "title": "Go fundamentals",
-      "cards": [
+          "question_md": "As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:\n$$a^* = \\arg\\max_a\\;\\Bigl[\\,Q(s,a) + c\\,P(s,a)\\,\\frac{\\sqrt{N(s)}}{1 + N(s,a)}\\,\\Bigr].$$\nEarly in the search the explore term $c\\,P(s,a)\\,\\dfrac{\\sqrt{N(s)}}{1 + N(s,a)}$ dominates, whereas later in the search the exploit term $Q(s,a)$ dominates. Think through why that's a consequence of the formula.",
+          "answer_md": "Unvisited children have a tiny denominator (just $1$), so their explore term is huge — they get tried first. Each subsequent visit makes less-visited siblings relatively more attractive and the move under consideration less attractive: the denominator $1 + N(s,a)$ grows linearly while $\\sqrt{N(s)}$ in the numerator grows only as a square root.\n\nThe prior $P(s,a)$ sets the order: high-prior moves get the biggest bonus and are tried first, low-prior moves later.\n\nThus the MCTS-derived $Q$ is leaned on more to determine the value of a node when you have visited it more.",
+          "question_html": "As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:\n\\[a^* = \\arg\\max_a\\;\\Bigl[\\,Q(s,a) + c\\,P(s,a)\\,\\frac{\\sqrt{N(s)}}{1 + N(s,a)}\\,\\Bigr].\\]\nEarly in the search the explore term \\(c\\,P(s,a)\\,\\dfrac{\\sqrt{N(s)}}{1 + N(s,a)}\\) dominates, whereas later in the search the exploit term \\(Q(s,a)\\) dominates. Think through why that's a consequence of the formula.",
+          "answer_html": "Unvisited children have a tiny denominator (just \\(1\\)), so their explore term is huge — they get tried first. Each subsequent visit makes less-visited siblings relatively more attractive and the move under consideration less attractive: the denominator \\(1 + N(s,a)\\) grows linearly while \\(\\sqrt{N(s)}\\) in the numerator grows only as a square root.\n\nThe prior \\(P(s,a)\\) sets the order: high-prior moves get the biggest bonus and are tried first, low-prior moves later.\n\nThus the MCTS-derived \\(Q\\) is leaned on more to determine the value of a node when you have visited it more."
+        },
         {
-          "question_md": "Why does a Go group need *two* eyes (not one) to be unconditionally alive?",
-          "answer_md": "Because only one stone is placed per turn. Filling either eye is suicide — the placed stone has 0 liberties because the *other* eye is still a liberty of the surrounding group — so the group can never be reduced to zero liberties. With one eye there is no fallback liberty, so filling it captures the group instead.\n\n![Go fundamentals](/images/eric-jang/two-eyes-unconditionally-alive.png)",
-          "question_html": "Why does a Go group need <i>two</i> eyes (not one) to be unconditionally alive?",
-          "answer_html": "Because only one stone is placed per turn. Filling either eye is suicide — the placed stone has 0 liberties because the <i>other</i> eye is still a liberty of the surrounding group — so the group can never be reduced to zero liberties. With one eye there is no fallback liberty, so filling it captures the group instead.\n\n<img src=\"two-eyes-unconditionally-alive.png\" alt=\"Go fundamentals\">"
-        }
-      ]
-    },
-    {
-      "id": "why-neural-nets-help",
-      "timestamp": "00:39:03",
-      "title": "Why neural nets help",
-      "cards": [
+          "question_md": "Of the four search-time quantities in PUCT — $Q(s,a)$, $P(s,a)$, $N(s)$, $N(s,a)$ — which is produced by the neural network and which live in the MCTS tree node?",
+          "answer_md": "- Neural network: $P(s,a)$ — the policy prior, written into a node once, when that node is first expanded.\n- MCTS node: $Q(s,a)$, $N(s)$, $N(s,a)$ — all running statistics of the search itself.",
+          "question_html": "Of the four search-time quantities in PUCT — \\(Q(s,a)\\), \\(P(s,a)\\), \\(N(s)\\), \\(N(s,a)\\) — which is produced by the neural network and which live in the MCTS tree node?",
+          "answer_html": "• Neural network: \\(P(s,a)\\) — the policy prior, written into a node once, when that node is first expanded.\n• MCTS node: \\(Q(s,a)\\), \\(N(s)\\), \\(N(s,a)\\) — all running statistics of the search itself."
+        },
         {
-          "question_md": "In AlphaGo's MCTS, what does the value head $V_\\theta(s)$ compute as a \"shortcut for searching to the end of the tree\"?",
-          "answer_md": "$V_\\theta(s) \\approx \\mathbb{E}[U \\mid s]$, the expected terminal outcome of self-play continued from $s$ — one forward pass replaces an exponential-depth rollout the network never explicitly enumerates.\n\n![Why neural nets help](/images/eric-jang/value-function-as-amortized-search.png)",
-          "question_html": "In AlphaGo's MCTS, what does the value head \\(V_\\theta(s)\\) compute as a \"shortcut for searching to the end of the tree\"?",
-          "answer_html": "\\(V_\\theta(s) \\approx \\mathbb{E}[U \\mid s]\\), the expected terminal outcome of self-play continued from \\(s\\) — one forward pass replaces an exponential-depth rollout the network never explicitly enumerates.\n\n<img src=\"value-function-as-amortized-search.png\" alt=\"Why neural nets help\">"
+          "question_md": "When a simulation reaches a newly evaluated leaf and produces a value $v$, every ancestor edge $(s,a)$ on the path back to the root updates its stored $Q$. What is the update rule, and what statistic does $Q(s,a)$ end up representing?",
+          "answer_md": "$$Q(s,a) \\;\\leftarrow\\; \\frac{N(s,a)\\,Q(s,a) + v}{N(s,a) + 1}, \\qquad N(s,a) \\leftarrow N(s,a) + 1.$$\n\nAn online running mean of the leaf values reached by simulations that passed through this edge. After $k$ such simulations, $Q(s,a)$ is just their arithmetic average.",
+          "question_html": "When a simulation reaches a newly evaluated leaf and produces a value \\(v\\), every ancestor edge \\((s,a)\\) on the path back to the root updates its stored \\(Q\\). What is the update rule, and what statistic does \\(Q(s,a)\\) end up representing?",
+          "answer_html": "\\[Q(s,a) \\;\\leftarrow\\; \\frac{N(s,a)\\,Q(s,a) + v}{N(s,a) + 1}, \\qquad N(s,a) \\leftarrow N(s,a) + 1.\\]\n\nAn online running mean of the leaf values reached by simulations that passed through this edge. After \\(k\\) such simulations, \\(Q(s,a)\\) is just their arithmetic average."
+        },
+        {
+          "question_md": "Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it *won* (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?",
+          "answer_md": "Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe one game is won by a genuinely better move; the other ~50 wins are statistical noise. Imitating winners gives you *one* useful gradient buried inside ~30,000 neutral move labels — drowned out.\n\nMCTS distillation has no credit-assignment problem. Instead of \"this game was won, copy these moves,\" it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.",
+          "question_html": "Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it <i>won</i> (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?",
+          "answer_html": "Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe one game is won by a genuinely better move; the other ~50 wins are statistical noise. Imitating winners gives you <i>one</i> useful gradient buried inside ~30,000 neutral move labels — drowned out.\n\nMCTS distillation has no credit-assignment problem. Instead of \"this game was won, copy these moves,\" it says: <i>at every state you visited, here is a strictly better move than the one you played.</i> Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning."
+        },
+        {
+          "question_md": "Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?",
+          "answer_md": "- NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*. Teacher = greedy $a$ from learned $Q$.\n- MCTS — search forward in time. UCT tree expansion over trajectories that *haven't happened yet*. Teacher = visit-count distribution.\n\nFrom the student's perspective the supervision is identical — the teacher's time-direction is invisible.\n\n![MCTS and NFSP — same student, opposite time-directions](/images/eric-jang/mcts-nfsp-time-direction.png)",
+          "question_html": "Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state \\(s\\) with a better action \\(a^<i>\\) for the student policy to imitate. They differ only in where \\(a^</i>\\) comes from. What is the duality?",
+          "answer_html": "• NFSP — search backward in time. Bellman/TD backup over trajectories that <i>already happened</i>. Teacher = greedy \\(a\\) from learned \\(Q\\).\n• MCTS — search forward in time. UCT tree expansion over trajectories that <i>haven't happened yet</i>. Teacher = visit-count distribution.\n\nFrom the student's perspective the supervision is identical — the teacher's time-direction is invisible.\n\n<img src=\"mcts-nfsp-time-direction.png\" alt=\"MCTS and NFSP — same student, opposite time-directions\">"
+        },
+        {
+          "question_md": "In the DeepSeek-R1 paper they said they weren't able to get MCTS to work for LLMs. What were the two big issues?",
+          "answer_md": "- Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.\n- Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you.",
+          "question_html": "In the DeepSeek-R1 paper they said they weren't able to get MCTS to work for LLMs. What were the two big issues?",
+          "answer_html": "• Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.\n• Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you."
+        },
+        {
+          "question_md": "AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?",
+          "answer_md": "Most Go fighting is local: captures, ladders, life-and-death problems. Convolutional receptive fields encode \"what's near this stone matters most,\" and a useful local pattern is learned once and reused everywhere on the board.",
+          "question_html": "AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?",
+          "answer_html": "Most Go fighting is local: captures, ladders, life-and-death problems. Convolutional receptive fields encode \"what's near this stone matters most,\" and a useful local pattern is learned once and reused everywhere on the board."
+        },
+        {
+          "question_md": "The AlphaGo network doesn't take into consideration previous board states. Why can it get away with that, and when would that not be possible?",
+          "answer_md": "Go is a perfect-information game, so the current board encodes all the relevant information — there's a Nash-equilibrium strategy that depends only on $s$.\n\nIn hidden-information games like poker or Diplomacy that breaks: the value of your hand depends on the opponent's *earlier* bluffs, alliances, betting patterns. Now you need an architecture that carries state across time (RNN, or Transformer over a history of states), not just one that attends over space.",
+          "question_html": "The AlphaGo network doesn't take into consideration previous board states. Why can it get away with that, and when would that not be possible?",
+          "answer_html": "Go is a perfect-information game, so the current board encodes all the relevant information — there's a Nash-equilibrium strategy that depends only on \\(s\\).\n\nIn hidden-information games like poker or Diplomacy that breaks: the value of your hand depends on the opponent's <i>earlier</i> bluffs, alliances, betting patterns. Now you need an architecture that carries state across time (RNN, or Transformer over a history of states), not just one that attends over space."
         }
       ]
     }

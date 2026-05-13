@@ -7,10 +7,9 @@ import { Episode } from "../types";
 //   - Section 5 answer: normalize lowercase `x` to `×`
 export const reinerPope: Episode = {
   slug: "reiner-pope",
-  title: "Reiner Pope on the Dwarkesh Podcast",
+  title: "Reiner Pope",
   guest: "Reiner Pope",
-  blurb:
-    "Practice questions for Reiner Pope's blackboard lecture on transformer inference, MoE layout, pipeline parallelism, RL-era training scale, and API pricing.",
+  blurb: "The math behind how LLMs are trained and served",
   date: "2026-04",
   youtubeUrl: "https://youtu.be/xmkSf5IS-zw",
   substackUrl: "https://www.dwarkesh.com/p/reiner-pope",

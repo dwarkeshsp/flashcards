@@ -22,7 +22,7 @@ export function Footer({ className = "", variant = "page" }: FooterProps) {
         </a>{" "}
         using{" "}
         <a
-          href="https://cursor.com"
+          href="https://cursor.com/dwarkesh"
           target="_blank"
           rel="noreferrer noopener"
           className="text-ink underline decoration-rule decoration-1 underline-offset-[3px] transition-colors hover:decoration-accent"

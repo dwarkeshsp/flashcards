@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Dwarkesh Podcast Flashcards",
   description:
-    "Practice questions for technical episodes of the Dwarkesh Podcast.",
+    "Flashcards for blackboard lectures of the Dwarkesh Podcast.",
   openGraph: {
     title: "Dwarkesh Podcast Flashcards",
     description:
-      "Practice questions for technical episodes of the Dwarkesh Podcast.",
+      "Flashcards for blackboard lectures of the Dwarkesh Podcast.",
     type: "website",
   },
 };

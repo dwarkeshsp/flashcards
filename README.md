@@ -5,7 +5,7 @@ episodes. Cards are generated end-to-end by a Cursor SDK agent pipeline
 that fans out one Opus 4.7 worker per card, with web search and matplotlib
 visual tooling. Built with Next.js 14 static export, Tailwind, and KaTeX.
 
-Each episode lives at `/episodes/<slug>/` with its own Markdown, JSON/TSV,
+Each episode lives at `/<slug>/` with its own Markdown, JSON/TSV,
 transcript, and Anki exports under `public/exports/<slug>/`.
 
 ## Local development
@@ -164,7 +164,7 @@ run.
 | `lib/episodes/index.ts` | Episode registry and display order |
 | `lib/episodes/generated.ts` | Auto-written list of pipeline-generated episodes |
 | `app/page.tsx` | Episode index |
-| `app/episodes/[slug]/page.tsx` | Episode flashcard page |
+| `app/[slug]/page.tsx` | Episode flashcard page |
 | `components/` | UI building blocks |
 | `public/images/` | Diagrams used inside answers |
 | `public/images/<slug>/` | Per-episode generated diagrams |
