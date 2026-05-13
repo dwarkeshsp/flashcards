@@ -31,8 +31,11 @@
 //   ---
 //
 //   # Section: Section title here
+//   id: short-id                  # optional, single line right after
+//                                 # the section header (defaults to a
+//                                 # slug of the title)
 //   timestamp: HH:MM:SS           # optional, single line right after
-//                                 # the section header
+//                                 # the section header / id line
 //
 //   ## Q: Question text, may continue on
 //   subsequent lines until the answer header.
@@ -146,9 +149,11 @@ function parseSectionHeader(line: string): string | null {
   return m ? m[1].trim() : null;
 }
 
-function parseTimestampMeta(line: string): string | null {
-  const m = /^timestamp:\s*(.+)$/.exec(line.trim());
-  return m ? m[1].trim() : null;
+function parseSectionMeta(
+  line: string
+): { key: "id" | "timestamp"; value: string } | null {
+  const m = /^(id|timestamp):\s*(.+)$/.exec(line.trim());
+  return m ? { key: m[1] as "id" | "timestamp", value: m[2].trim() } : null;
 }
 
 function parseQHeader(line: string): { rest: string } | null {
@@ -210,21 +215,29 @@ function parseBody(body: string, sourcePath: string): Section[] {
     const sectionTitle = parseSectionHeader(line);
     if (sectionTitle) {
       finishCard();
-      // Skip blank lines and pick up an optional `timestamp:` meta
-      // line on the next non-blank line.
+      // Consume optional `id:` and `timestamp:` meta lines, in any
+      // order, separated by blank lines. Stop at the first
+      // non-blank line that isn't one of those meta keys.
       let j = i + 1;
-      while (j < lines.length && lines[j].trim() === "") j++;
+      let id: string | undefined;
       let timestamp: string | undefined;
-      if (j < lines.length) {
-        const ts = parseTimestampMeta(lines[j]);
-        if (ts) {
-          timestamp = ts;
-          i = j;
+      while (j < lines.length) {
+        const t = lines[j].trim();
+        if (t === "") {
+          j++;
+          continue;
         }
+        const meta = parseSectionMeta(lines[j]);
+        if (!meta) break;
+        if (meta.key === "id") id = meta.value;
+        if (meta.key === "timestamp") timestamp = meta.value;
+        j++;
       }
-      const id = slugify(sectionTitle) || `section-${sections.length + 1}`;
+      i = j - 1;
+      const finalId =
+        id ?? slugify(sectionTitle) ?? `section-${sections.length + 1}`;
       currentSection = {
-        id,
+        id: finalId,
         title: sectionTitle,
         cards: [],
         ...(timestamp ? { timestamp } : {}),

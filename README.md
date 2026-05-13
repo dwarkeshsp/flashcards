@@ -152,9 +152,10 @@ the card visual — they must reconstruct the diagram.
 Hand-curated episodes use **Markdown as the single source of truth**.
 The cards live in `content/<slug>-cards.md`; the corresponding
 `lib/episodes/<slug>.ts` is a thin adapter that calls
-`parseEpisodeMd("content/<slug>-cards.md")` at build time. The
-website, the per-episode `.md` / `.tsv` / `.json` exports, and the
-`.apkg` Anki deck all flow downstream of that one parse:
+`parseEpisodeMd("content/<slug>-cards.md")` at build time. Currently
+on this format: Eric Jang, Reiner Pope. The website, the per-episode
+`.md` / `.tsv` / `.json` exports, and the `.apkg` Anki deck all flow
+downstream of that one parse:
 
 ```
 content/<slug>-cards.md   ← edit this
