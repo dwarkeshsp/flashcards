@@ -12,7 +12,7 @@ Building AlphaGo from scratch
 
 To guide and prune the MCTS search.
 
-### Q2. The AlphaGo network takes in \_\_\_ and outputs both \_\_\_ and \_\_\_.
+### Q2. The AlphaGo network takes in ___ and outputs both ___ and ___.
 
 - Input: the current board state.
 - Outputs: a policy — a probability distribution over the legal moves — and a value — the probability the current player will win.
@@ -27,12 +27,13 @@ To guide and prune the MCTS search.
 ### Q4. The AlphaZero loss is composed of two quantities. What are they conceptually, and mathematically?
 
 Conceptually:
+
 1. Make the value head predict who actually won.
 2. Make the policy head predict the MCTS visit distribution at that state.
 
 Mathematically, summed over states visited in self-play:
 
-$$\mathcal{L}(\theta) \;=\; \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value: MSE vs game outcome } z\in\{-1,+1\}} \;+\; \underbrace{-\,\boldsymbol{\pi}_{\text{MCTS}}(s)^{\top}\log P_\theta(\cdot\mid s)}_{\text{policy: cross-entropy vs MCTS visit distribution}}.$$
+$$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value: MSE vs game outcome } z\in\{-1,+1\}} \;+\; \underbrace{-\,\boldsymbol{\pi}_{\text{MCTS}}(s)^{\top}\log P_\theta(\cdot\mid s)}_{\text{policy: cross-entropy vs MCTS visit distribution}}.$$
 
 ### Q5. If there are up to ~361 legal moves per turn and a Go game can last ~300 turns, the naive game tree has on the order of $361^{300}$ trajectories. Which axis does the policy head prune, and which does the value head prune?
 
@@ -49,7 +50,9 @@ $$\mathcal{L}(\theta) \;=\; \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{va
 No — the tree is discarded and rebuilt from scratch each move.
 
 ### Q8. As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:
+
 $$a^* = \arg\max_a\;\Bigl[\,Q(s,a) + c\,P(s,a)\,\frac{\sqrt{N(s)}}{1 + N(s,a)}\,\Bigr].$$
+
 Early in the search the explore term $c\,P(s,a)\,\dfrac{\sqrt{N(s)}}{1 + N(s,a)}$ dominates, whereas later in the search the exploit term $Q(s,a)$ dominates. Think through why that's a consequence of the formula.
 
 Unvisited children have a tiny denominator (just $1$), so their explore term is huge — they get tried first. Each subsequent visit makes less-visited siblings relatively more attractive and the move under consideration less attractive: the denominator $1 + N(s,a)$ grows linearly while $\sqrt{N(s)}$ in the numerator grows only as a square root.
@@ -65,7 +68,7 @@ Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node whe
 
 ### Q10. When a simulation reaches a newly evaluated leaf and produces a value $v$, every ancestor edge $(s,a)$ on the path back to the root updates its stored $Q$. What is the update rule, and what statistic does $Q(s,a)$ end up representing?
 
-$$Q(s,a) \;\leftarrow\; \frac{N(s,a)\,Q(s,a) + v}{N(s,a) + 1}, \qquad N(s,a) \leftarrow N(s,a) + 1.$$
+$$Q(s,a) \leftarrow \frac{N(s,a)\,Q(s,a) + v}{N(s,a) + 1}, \qquad N(s,a) \leftarrow N(s,a) + 1.$$
 
 An online running mean of the leaf values reached by simulations that passed through this edge. After $k$ such simulations, $Q(s,a)$ is just their arithmetic average.
 

@@ -8,7 +8,8 @@
     "start": "next start",
     "pipeline": "tsx scripts/pipeline/run.ts",
     "export-files": "tsx scripts/export-files.ts",
-    "build-anki": "python3 scripts/build_anki.py"
+    "build-anki": "python3 scripts/build_anki.py",
+    "build-cards": "npm run export-files && npm run build-anki"
   },
   "dependencies": {
     "@cursor/sdk": "^1.0.12",

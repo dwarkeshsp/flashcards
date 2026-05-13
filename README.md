@@ -149,12 +149,37 @@ the card visual — they must reconstruct the diagram.
 
 ### Manual editing
 
-Built-in episodes live in `lib/episodes/` and are imported directly.
-Pipeline-generated episodes are written into per-episode files
-(`lib/episodes/<slug>.ts`) and then registered via
-`lib/episodes/generated.ts`. To hand-tune a generated card, edit the
-generated file directly; the pipeline will overwrite it on the next
+Hand-curated episodes use **Markdown as the single source of truth**.
+The cards live in `content/<slug>-cards.md`; the corresponding
+`lib/episodes/<slug>.ts` is a thin adapter that calls
+`parseEpisodeMd("content/<slug>-cards.md")` at build time. The
+website, the per-episode `.md` / `.tsv` / `.json` exports, and the
+`.apkg` Anki deck all flow downstream of that one parse:
+
+```
+content/<slug>-cards.md   ← edit this
+        │ parseEpisodeMd (lib/episodes/parse-md.ts)
+        ▼
+lib/episodes/<slug>.ts (thin adapter)
+        │
+        ├── app/[slug]/page.tsx       → rendered website
+        └── scripts/export-files.ts   → public/exports/<slug>/flashcards.{md,tsv,json}
+                                          │
+                                          └── scripts/build_anki.py → flashcards.apkg
+```
+
+After editing the markdown, run `npm run build-cards` to regenerate
+the exports and Anki deck. The Next.js dev server picks up changes
+automatically.
+
+Pipeline-generated episodes (`scripts/pipeline/run.ts`) still write
+directly into `lib/episodes/<slug>.ts`; they don't currently use the
+markdown source format. To hand-tune a generated card, edit the
+generated file directly — the pipeline will overwrite it on the next
 run.
+
+The Markdown format is documented at the top of
+`lib/episodes/parse-md.ts`.
 
 ## Directory layout
 

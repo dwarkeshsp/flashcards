@@ -1,19 +1,30 @@
 ---
-
-## slug: eric-jang
-
-title: Eric Jang on AlphaGo and AlphaZero
+slug: eric-jang
+title: Eric Jang
 guest: Eric Jang
+blurb: Building AlphaGo from scratch
 date: 2026-05-08
 transcript: transcripts/eric-jang.md
+flatten: true
+---
 
 # Editing notes
 
-- One card per `## Q:` / `### A:` pair. Card boundaries are `---` between cards.
-- The `# Section: …` headers below are an editorial scaffold for grouping cards. On the rendered site they are currently flattened into a single section called "All cards" (no timestamps yet). When real timestamps are added for this episode, promote the sections back individually into `lib/episodes/eric-jang.ts`.
-- LaTeX is inline `$...$` or block `$$...$$`. Markdown italics work; bolding is intentionally avoided.
-- `<!-- TODO(visual): … -->` lines mark animations I think would help.
-- Order below is the intended reading order on the site.
+- This Markdown file is the single source of truth for this episode.
+  The website, the per-episode .md / .tsv / .json exports, and the
+  Anki .apkg deck are all generated from it.
+- One card per `## Q:` / `### A:` pair. Card boundaries are `---`
+  between cards.
+- The `# Section: …` headers below are an editorial scaffold for
+  grouping cards. With `flatten: true` in the frontmatter they are
+  collapsed into a single rendered section called "All cards". When
+  real timestamps are added, flip `flatten: false` and the parsed
+  sections (with their `timestamp: HH:MM:SS` lines) will render
+  individually.
+- LaTeX is inline `$...$` or block `$$...$$`. Markdown italics work;
+  bolding is intentionally avoided.
+- `<!-- TODO(visual): … -->` lines mark animations I think would
+  help. They are ignored by the parser.
 
 ---
 
