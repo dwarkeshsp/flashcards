@@ -48,11 +48,6 @@ export function Sidebar({ sections }: { sections: Section[] }) {
                 }`}
               >
                 <div className="flex items-baseline gap-2">
-                  {s.timestamp ? (
-                    <span className="text-[0.7rem] tabular-nums text-ink-faint">
-                      {s.timestamp}
-                    </span>
-                  ) : null}
                   <span className="text-[0.7rem] tabular-nums text-ink-faint">
                     {s.cards.length > 0 ? `${s.cards.length} cards` : "transcript only"}
                   </span>
