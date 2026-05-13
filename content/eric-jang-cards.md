@@ -103,9 +103,13 @@ timestamp: 00:46:51
 
 timestamp: 00:44:14
 
-## Q: During inference, is anything about the MCTS search preserved between moves?
+## Q: When AlphaZero is going to make a move, it kicks off MCTS with an empty tree. For each simulation of MCTS (1600 per move), what happens?
 
-### A: No — the tree is discarded and rebuilt from scratch each move.
+### A:
+
+- Descend. Walk down from the root, at each node picking the child whose PUCT score is highest.
+- Expand. Run the neural network on that leaf state once. It returns priors over the leaf's legal moves and a value estimate of who's winning from there.
+- Back up. Walk back up to the root. On every edge you descended through, increment its visit count and fold the new leaf value into its running average.
 
 ---
 
@@ -200,7 +204,11 @@ timestamp: 00:47:30
 
 ## Q: AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?
 
-### A: Most Go fighting is local: captures, ladders, life-and-death problems. Convolutional receptive fields encode "what's near this stone matters most," and a useful local pattern is learned once and reused everywhere on the board.
+### A:
+
+Most Go fighting is local: captures, ladders, life-and-death problems. Convolutional receptive fields encode "what's near this stone matters most," and a useful local pattern is learned once and reused everywhere on the board.
+
+Eric addendum: "With larger-scale data + compute, transformers can learn these biases from scratch, but it didn't emerge at the scale of experiments I was trying."
 
 ---
 

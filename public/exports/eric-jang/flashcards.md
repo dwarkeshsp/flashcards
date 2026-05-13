@@ -45,9 +45,11 @@ $$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value:
 - To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.
 - You can't easily turn MCTS into a single scalar, and the whole point of training is to distill the MCTS search into the model.
 
-### Q7. During inference, is anything about the MCTS search preserved between moves?
+### Q7. When AlphaZero is going to make a move, it kicks off MCTS with an empty tree. For each simulation of MCTS (1600 per move), what happens?
 
-No — the tree is discarded and rebuilt from scratch each move.
+- Descend. Walk down from the root, at each node picking the child whose PUCT score is highest.
+- Expand. Run the neural network on that leaf state once. It returns priors over the leaf's legal moves and a value estimate of who's winning from there.
+- Back up. Walk back up to the root. On every edge you descended through, increment its visit count and fold the new leaf value into its running average.
 
 ### Q8. As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:
 
@@ -95,6 +97,8 @@ From the student's perspective the supervision is identical — the teacher's ti
 ### Q14. AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?
 
 Most Go fighting is local: captures, ladders, life-and-death problems. Convolutional receptive fields encode "what's near this stone matters most," and a useful local pattern is learned once and reused everywhere on the board.
+
+Eric addendum: "With larger-scale data + compute, transformers can learn these biases from scratch, but it didn't emerge at the scale of experiments I was trying."
 
 ### Q15. The AlphaGo network doesn't take into consideration previous board states. Why can it get away with that, and when would that not be possible?
 
