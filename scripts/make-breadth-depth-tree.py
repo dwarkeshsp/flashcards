@@ -1,9 +1,14 @@
 """Q5 — Two heads carve up the tree.
 
-Simpler take: one clean bounded tree, with two annotations placed
-outside the tree itself.
-  - Horizontal bracket across the top  → "breadth" (policy)
-  - Vertical bracket along the right side → "depth" (value)
+Show the unexplored space in addition to the explored one:
+  - Background: dense, faded "phantom" tree representing the
+    ~361^300 branches MCTS never touches.
+  - Foreground: solid black MCTS subtree threaded through the
+    middle — narrower (policy prunes breadth) and shallower
+    (value prunes depth) than the phantom.
+  - Two annotations: a blue "policy" funnel at the top showing
+    the breadth being pruned, and an orange dashed horizontal
+    line where the value head truncates depth.
 """
 from pathlib import Path
 import sys
@@ -13,58 +18,108 @@ from style import BG, INK, BLUE, ORANGE, FAINT, apply_house_style
 
 import matplotlib.pyplot as plt
 from matplotlib import patches
-from matplotlib.patches import FancyArrowPatch
 
 apply_house_style()
 
-fig, ax = plt.subplots(figsize=(9.5, 5.2), dpi=140)
+fig, ax = plt.subplots(figsize=(10.5, 5.8), dpi=140)
 fig.patch.set_facecolor(BG)
 ax.set_facecolor(BG)
-ax.set_xlim(-1.1, 1.1)
-ax.set_ylim(-0.1, 1.2)
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
 ax.axis("off")
 
 
-# A clean bounded tree: 4 levels.
-def tree(root_xy, half_width, branching, depth, color=INK, lw=1.0):
-    if depth == 0:
+ROOT = (0.5, 0.94)
+LEVEL_DY = 0.155  # vertical step between levels
+
+
+# ── Phantom tree — wide and deep, very faded ──────────────────────────
+PHANTOM_BRANCHING = 5
+PHANTOM_LEVELS = 5
+PHANTOM_HALF_WIDTH = 0.46
+
+
+def phantom(x, y, level, half_w):
+    if level >= PHANTOM_LEVELS:
         return
-    x, y = root_xy
-    child_y = y - 0.20
-    for k in range(branching):
-        t = (k + 0.5) / branching
-        cx = x + (t - 0.5) * 2 * half_width
-        ax.plot([x, cx], [y, child_y], color=color, lw=lw)
-        ax.add_patch(patches.Circle((cx, child_y), 0.024,
-                                     facecolor=BG, edgecolor=color, lw=lw))
-        tree((cx, child_y), half_width / branching * 0.85,
-             branching - 1 if depth > 2 else branching, depth - 1, color, lw)
+    cy = y - LEVEL_DY
+    for k in range(PHANTOM_BRANCHING):
+        t = (k + 0.5) / PHANTOM_BRANCHING
+        cx = x + (t - 0.5) * 2 * half_w
+        ax.plot([x, cx], [y, cy],
+                color=FAINT, lw=0.28, alpha=0.40, zorder=1)
+        phantom(cx, cy, level + 1, half_w / PHANTOM_BRANCHING * 0.92)
 
 
-# Root
-root = (0.0, 1.0)
-ax.add_patch(patches.Circle(root, 0.03, facecolor=BG, edgecolor=INK, lw=1.0))
-tree(root, 0.7, branching=4, depth=4, color=INK, lw=0.9)
+phantom(*ROOT, 0, PHANTOM_HALF_WIDTH)
 
-# Horizontal bracket across the top — breadth (blue)
-bracket_y = 1.10
-ax.plot([-0.7, 0.7], [bracket_y, bracket_y], color=BLUE, lw=1.0)
-ax.plot([-0.7, -0.7], [bracket_y - 0.02, bracket_y + 0.02], color=BLUE, lw=1.0)
-ax.plot([0.7, 0.7], [bracket_y - 0.02, bracket_y + 0.02], color=BLUE, lw=1.0)
-ax.text(0, bracket_y + 0.05, "breadth", ha="center", va="bottom",
-        color=BLUE, fontsize=11, style="italic")
-ax.text(0, bracket_y + 0.005, "(policy)", ha="center", va="bottom",
-        color=BLUE, fontsize=9)
 
-# Vertical bracket along the right side — depth (orange)
-bracket_x = 0.95
-ax.plot([bracket_x, bracket_x], [0.05, 1.0], color=ORANGE, lw=1.0)
-ax.plot([bracket_x - 0.02, bracket_x + 0.02], [1.0, 1.0], color=ORANGE, lw=1.0)
-ax.plot([bracket_x - 0.02, bracket_x + 0.02], [0.05, 0.05], color=ORANGE, lw=1.0)
-ax.text(bracket_x + 0.05, 0.5, "depth", ha="left", va="center",
-        rotation=90, color=ORANGE, fontsize=11, style="italic")
-ax.text(bracket_x + 0.10, 0.5, "(value)", ha="left", va="center",
-        rotation=90, color=ORANGE, fontsize=9)
+# ── Actual MCTS tree — narrower, shallower, solid ──────────────────────
+ACTUAL_BRANCHING = 2
+ACTUAL_LEVELS = 3
+ACTUAL_HALF_WIDTH = 0.16
+
+
+def actual(x, y, level, half_w):
+    if level >= ACTUAL_LEVELS:
+        return
+    cy = y - LEVEL_DY
+    for k in range(ACTUAL_BRANCHING):
+        t = (k + 0.5) / ACTUAL_BRANCHING
+        cx = x + (t - 0.5) * 2 * half_w
+        ax.plot([x, cx], [y, cy], color=INK, lw=1.2, zorder=3)
+        ax.add_patch(
+            patches.Circle((cx, cy), 0.014,
+                            facecolor=BG, edgecolor=INK, lw=1.0, zorder=4)
+        )
+        actual(cx, cy, level + 1, half_w / ACTUAL_BRANCHING * 0.85)
+
+
+# Root node marker
+ax.add_patch(
+    patches.Circle(ROOT, 0.018, facecolor=BG, edgecolor=INK, lw=1.0, zorder=4)
+)
+actual(*ROOT, 0, ACTUAL_HALF_WIDTH)
+
+
+# ── Value head: dashed orange line at the depth of the deepest visited node ──
+y_cut = ROOT[1] - ACTUAL_LEVELS * LEVEL_DY
+ax.plot([0.04, 0.96], [y_cut, y_cut],
+        linestyle="--", color=ORANGE, lw=1.3, zorder=5)
+ax.text(
+    0.96, y_cut - 0.012,
+    "value head  $\\to$  prunes depth",
+    ha="right", va="top",
+    color=ORANGE, fontsize=10.5, style="italic",
+)
+
+
+# ── Policy head: soft blue funnel above the actual tree, labelled at top ────
+funnel = patches.Polygon(
+    [
+        (0.5 - ACTUAL_HALF_WIDTH * 0.6, ROOT[1] + 0.005),
+        (0.5 + ACTUAL_HALF_WIDTH * 0.6, ROOT[1] + 0.005),
+        (0.5 + PHANTOM_HALF_WIDTH * 0.55, y_cut),
+        (0.5 - PHANTOM_HALF_WIDTH * 0.55, y_cut),
+    ],
+    closed=True, facecolor=BLUE, alpha=0.05, edgecolor="none", zorder=0,
+)
+ax.add_patch(funnel)
+# Two dashed boundary lines for the funnel.
+for sign in (-1, 1):
+    ax.plot(
+        [0.5 + sign * ACTUAL_HALF_WIDTH * 0.55, 0.5 + sign * PHANTOM_HALF_WIDTH * 0.55],
+        [ROOT[1] - 0.02, y_cut],
+        color=BLUE, lw=0.9, alpha=0.55, linestyle="--", zorder=2,
+    )
+
+ax.text(
+    0.5, ROOT[1] + 0.045,
+    "policy head  $\\to$  prunes breadth",
+    ha="center", va="bottom",
+    color=BLUE, fontsize=10.5, style="italic",
+)
+
 
 out = Path("public/images/eric-jang/breadth-depth-tree.png")
 plt.savefig(out, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=140)
