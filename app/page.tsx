@@ -9,12 +9,18 @@ export default function Page() {
     <div className="min-h-screen bg-paper">
       <main className="mx-auto max-w-3xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
         <header className="mb-14">
-          <h1 className="font-serif text-[2.5rem] font-medium leading-[1.05] tracking-tight text-ink sm:text-[3rem]">
-            Dwarkesh Podcast Flashcards
+          <h1 className="max-w-prose text-[1.5rem] leading-snug tracking-tight text-ink sm:text-[1.75rem]">
+            Flashcards for blackboard lectures of the{" "}
+            <a
+              href="https://www.youtube.com/@DwarkeshPatel"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="underline decoration-rule decoration-1 underline-offset-[4px] transition-colors hover:text-accent hover:decoration-accent"
+            >
+              Dwarkesh Podcast
+            </a>
+            .
           </h1>
-          <p className="mt-5 max-w-prose text-[1.0625rem] leading-relaxed text-ink-muted">
-            Flashcards for blackboard lectures of the Dwarkesh Podcast.
-          </p>
         </header>
 
         <ul className="space-y-3">
