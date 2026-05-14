@@ -1,15 +1,12 @@
-"""Q5 — How two heads carve up the 361^300 search space.
+"""Q5 — Two heads carve up the tree.
 
-Three panels left to right:
-  1. The naive game tree: bushy / deep.
-  2. Policy prunes breadth: keeps a thin band of candidate moves.
-  3. Value prunes depth: truncates rollouts at internal nodes.
-
-Final caption: ~ a few thousand-node MCTS tree per move.
+Simpler take: one clean bounded tree, with two annotations placed
+outside the tree itself.
+  - Horizontal bracket across the top  → "breadth" (policy)
+  - Vertical bracket along the right side → "depth" (value)
 """
-import math
-import sys
 from pathlib import Path
+import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from style import BG, INK, BLUE, ORANGE, FAINT, apply_house_style
@@ -20,131 +17,54 @@ from matplotlib.patches import FancyArrowPatch
 
 apply_house_style()
 
-fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.5), dpi=140)
+fig, ax = plt.subplots(figsize=(9.5, 5.2), dpi=140)
 fig.patch.set_facecolor(BG)
+ax.set_facecolor(BG)
+ax.set_xlim(-1.1, 1.1)
+ax.set_ylim(-0.1, 1.2)
+ax.axis("off")
 
 
-def draw_tree(ax, *, prune_breadth: bool, prune_depth: bool, panel_title: str):
-    ax.set_facecolor(BG)
-    ax.set_xlim(-1, 1)
-    ax.set_ylim(-0.05, 1.1)
-    ax.set_aspect("auto")
-    ax.axis("off")
-
-    # Root at top, expand downward; each level fans out.
-    levels = 6 if not prune_depth else 3
-    branching = 7
-    spread = 0.95
-
-    # Recursive draw.
-    def draw_subtree(x, y, level, x_half_width, kept_fraction=1.0):
-        if level >= levels:
-            return
-        child_y = y - (1.0 / 6.0)
-        # When pruning breadth, only keep the central kept_fraction of children.
-        n = branching
-        if prune_breadth and level >= 0:
-            n_keep = max(2, int(round(n * kept_fraction)))
-            indices = range((n - n_keep) // 2, (n - n_keep) // 2 + n_keep)
-        else:
-            indices = range(n)
-
-        for k in range(n):
-            t = (k + 0.5) / n
-            cx = x + (t - 0.5) * 2 * x_half_width
-            edge_color = INK if k in indices else FAINT
-            edge_alpha = 0.9 if k in indices else 0.15
-            ax.plot(
-                [x, cx],
-                [y, child_y],
-                color=edge_color,
-                alpha=edge_alpha,
-                lw=0.6 if k not in indices else 0.9,
-            )
-            if k in indices:
-                next_half = x_half_width / branching * 0.9
-                next_kept = (
-                    max(0.35, kept_fraction * 0.6) if prune_breadth else 1.0
-                )
-                draw_subtree(cx, child_y, level + 1, next_half, next_kept)
-
-    draw_subtree(0, 1.0, 0, spread, kept_fraction=0.55 if prune_breadth else 1.0)
-
-    # If pruning depth, draw a horizontal value-cut line and label it.
-    if prune_depth:
-        cut_y = 1.0 - (1.0 / 6.0) * levels
-        ax.plot(
-            [-spread, spread],
-            [cut_y, cut_y],
-            linestyle="--",
-            color=ORANGE,
-            lw=1.2,
-        )
-        ax.text(
-            spread,
-            cut_y - 0.04,
-            "$V_\\theta(s)$  truncates",
-            ha="right",
-            va="top",
-            color=ORANGE,
-            fontsize=10,
-            style="italic",
-        )
-
-    # If pruning breadth, draw a soft cone showing the kept band.
-    if prune_breadth:
-        cone = patches.Polygon(
-            [
-                (-0.2, 1.0),
-                (0.2, 1.0),
-                (spread * 0.55, -0.05),
-                (-spread * 0.55, -0.05),
-            ],
-            closed=True,
-            facecolor=BLUE,
-            alpha=0.07,
-            edgecolor="none",
-        )
-        ax.add_patch(cone)
-        ax.text(
-            -spread * 0.55,
-            -0.02,
-            "$P(a\\mid s)$  guides",
-            ha="left",
-            va="bottom",
-            color=BLUE,
-            fontsize=10,
-            style="italic",
-        )
-
-    ax.set_title(panel_title, color=INK, fontsize=12, pad=10)
+# A clean bounded tree: 4 levels.
+def tree(root_xy, half_width, branching, depth, color=INK, lw=1.0):
+    if depth == 0:
+        return
+    x, y = root_xy
+    child_y = y - 0.20
+    for k in range(branching):
+        t = (k + 0.5) / branching
+        cx = x + (t - 0.5) * 2 * half_width
+        ax.plot([x, cx], [y, child_y], color=color, lw=lw)
+        ax.add_patch(patches.Circle((cx, child_y), 0.024,
+                                     facecolor=BG, edgecolor=color, lw=lw))
+        tree((cx, child_y), half_width / branching * 0.85,
+             branching - 1 if depth > 2 else branching, depth - 1, color, lw)
 
 
-draw_tree(
-    axes[0],
-    prune_breadth=False,
-    prune_depth=False,
-    panel_title="naive tree  $\\sim 361^{300}$",
-)
-draw_tree(
-    axes[1],
-    prune_breadth=True,
-    prune_depth=False,
-    panel_title="policy prunes breadth",
-)
-draw_tree(
-    axes[2],
-    prune_breadth=True,
-    prune_depth=True,
-    panel_title="value prunes depth  $\\rightarrow$  sparse MCTS tree",
-)
+# Root
+root = (0.0, 1.0)
+ax.add_patch(patches.Circle(root, 0.03, facecolor=BG, edgecolor=INK, lw=1.0))
+tree(root, 0.7, branching=4, depth=4, color=INK, lw=0.9)
 
-fig.suptitle(
-    "Two heads, two cuts: from $361^{300}$ to a few thousand nodes per move",
-    y=1.02,
-    fontsize=13,
-    color=INK,
-)
+# Horizontal bracket across the top — breadth (blue)
+bracket_y = 1.10
+ax.plot([-0.7, 0.7], [bracket_y, bracket_y], color=BLUE, lw=1.0)
+ax.plot([-0.7, -0.7], [bracket_y - 0.02, bracket_y + 0.02], color=BLUE, lw=1.0)
+ax.plot([0.7, 0.7], [bracket_y - 0.02, bracket_y + 0.02], color=BLUE, lw=1.0)
+ax.text(0, bracket_y + 0.05, "breadth", ha="center", va="bottom",
+        color=BLUE, fontsize=11, style="italic")
+ax.text(0, bracket_y + 0.005, "(policy)", ha="center", va="bottom",
+        color=BLUE, fontsize=9)
+
+# Vertical bracket along the right side — depth (orange)
+bracket_x = 0.95
+ax.plot([bracket_x, bracket_x], [0.05, 1.0], color=ORANGE, lw=1.0)
+ax.plot([bracket_x - 0.02, bracket_x + 0.02], [1.0, 1.0], color=ORANGE, lw=1.0)
+ax.plot([bracket_x - 0.02, bracket_x + 0.02], [0.05, 0.05], color=ORANGE, lw=1.0)
+ax.text(bracket_x + 0.05, 0.5, "depth", ha="left", va="center",
+        rotation=90, color=ORANGE, fontsize=11, style="italic")
+ax.text(bracket_x + 0.10, 0.5, "(value)", ha="left", va="center",
+        rotation=90, color=ORANGE, fontsize=9)
 
 out = Path("public/images/eric-jang/breadth-depth-tree.png")
 plt.savefig(out, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=140)

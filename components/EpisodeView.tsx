@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Episode } from "@/lib/types";
 import { EpisodeHeader } from "./EpisodeHeader";
 import { SectionView } from "./SectionView";
-import { Sidebar } from "./Sidebar";
 import { Footer } from "./Footer";
 
 export function EpisodeView({ episode }: { episode: Episode }) {
@@ -42,35 +41,30 @@ export function EpisodeView({ episode }: { episode: Episode }) {
   return (
     <div className="min-h-screen bg-paper">
       <EpisodeHeader episode={episode} />
-      <main className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="grid grid-cols-1 gap-10 py-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
-          <Sidebar sections={episode.sections} />
-          <div className="min-w-0">
-            {episode.sections.map((s) => {
-              const count = s.cards.length;
-              const allOpen = sectionAllOpen(s.id, count);
-              return (
-                <SectionView
-                  key={s.id}
-                  section={s}
-                  openIds={openIds}
-                  toggle={toggle}
-                  episodeUrl={episode.youtubeUrl}
-                  headerExtra={
-                    count > 0 ? (
-                      <button
-                        onClick={() => toggleSection(s.id, count)}
-                        className="text-[0.78rem] text-ink-faint underline decoration-rule decoration-1 underline-offset-[3px] transition-colors hover:text-ink hover:decoration-accent"
-                      >
-                        {allOpen ? "Collapse all" : "Expand all"}
-                      </button>
-                    ) : null
-                  }
-                />
-              );
-            })}
-          </div>
-        </div>
+      <main className="mx-auto max-w-3xl px-5 pt-5 pb-10 sm:px-8 sm:pt-6">
+        {episode.sections.map((s) => {
+          const count = s.cards.length;
+          const allOpen = sectionAllOpen(s.id, count);
+          return (
+            <SectionView
+              key={s.id}
+              section={s}
+              openIds={openIds}
+              toggle={toggle}
+              episodeUrl={episode.youtubeUrl}
+              headerExtra={
+                count > 0 ? (
+                  <button
+                    onClick={() => toggleSection(s.id, count)}
+                    className="text-[0.78rem] text-ink-faint underline decoration-rule decoration-1 underline-offset-[3px] transition-colors hover:text-ink hover:decoration-accent"
+                  >
+                    {allOpen ? "Collapse all" : "Expand all"}
+                  </button>
+                ) : null
+              }
+            />
+          );
+        })}
         <Footer variant="episode" />
       </main>
     </div>

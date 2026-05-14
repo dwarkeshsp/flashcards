@@ -35,7 +35,7 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
 
   return (
     <header className="border-b border-rule bg-paper/95 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-5 pt-6 pb-10 sm:px-8 sm:pt-8 sm:pb-12">
+      <div className="mx-auto max-w-3xl px-5 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-7">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-[0.78rem] text-ink-faint transition-colors hover:text-ink"
@@ -96,7 +96,7 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
           ) : null}
         </div>
 
-        <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-rule pt-5">
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-ink-faint">
             Download
           </span>

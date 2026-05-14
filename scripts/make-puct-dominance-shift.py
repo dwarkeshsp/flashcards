@@ -1,104 +1,67 @@
-"""Q9 — PUCT explore-vs-exploit dominance shifts as visits accumulate.
+"""Q9 — PUCT explore vs exploit crossover.
 
-Plot two contributions to the PUCT score for a single edge (s,a) as
-N_a grows:
-  * Exploration term  c * P(s,a) * sqrt(N) / (1 + N_a)  — starts huge,
-    decays roughly as 1 / sqrt(N_a) (since the parent visits N grow
-    in lockstep).
-  * Exploit term  Q(s,a)  — settles to a stable value once enough
-    rollouts have averaged through this edge.
-
-A vertical guide marks where the two cross — the "intuition → search-
-refined consensus" transition.
+Two smooth lines, inline labels, axis arrows. Matches the house style
+of public/images/latency-vs-batch.png and cost-vs-context.png.
 """
-import sys
 from pathlib import Path
+import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from style import BG, INK, BLUE, ORANGE, FAINT, apply_house_style
 
-import math
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
 
 apply_house_style()
 
-fig, ax = plt.subplots(figsize=(9.5, 5.5), dpi=140)
+fig, ax = plt.subplots(figsize=(9.5, 5.0), dpi=140)
 fig.patch.set_facecolor(BG)
 ax.set_facecolor(BG)
 
-N_a = np.arange(0, 200)
-# Parent visits grow with this child's visits — assume the child gets
-# roughly half of all parent visits once it has been chosen
-# repeatedly. The qualitative shape only depends on the ratio.
-N_parent = np.maximum(1, N_a * 2 + 1)
-c_puct = 1.6
-prior = 0.35
-explore = c_puct * prior * np.sqrt(N_parent) / (1.0 + N_a)
+N = np.linspace(0.1, 100, 400)
+# Exploration term: decays as ~ 1 / sqrt(N).
+explore = 1.0 / np.sqrt(N + 1) * 2.5
+# Q value: smoothly rises and settles around 0.7 (no jagged noise).
+Q = 0.7 * (1 - np.exp(-(N) / 12.0))
 
-# Q value settles around 0.62 with a bit of noise early.
-rng = np.random.default_rng(7)
-noise = np.zeros_like(N_a, dtype=float)
-for i in range(len(N_a)):
-    n = max(1, N_a[i])
-    noise[i] = rng.normal(0.0, 0.6 / math.sqrt(n))
-Q = 0.62 + noise
+ax.plot(N, explore, color=ORANGE, lw=2.2)
+ax.plot(N, Q, color=BLUE, lw=2.2)
 
-ax.plot(N_a, explore, color=ORANGE, lw=2.2, label="exploration term")
-ax.plot(N_a, Q, color=BLUE, lw=2.0, label="$Q(s,a)$")
+# Inline labels at the right end of each line.
+ax.text(N[-1] + 1.5, explore[-1], "explore",
+        ha="left", va="center", color=ORANGE, fontsize=11)
+ax.text(N[-1] + 1.5, Q[-1], "$Q$",
+        ha="left", va="center", color=BLUE, fontsize=12, style="italic")
 
-# Crossover marker: first index where Q > explore.
-cross_idx = int(np.argmax(Q > explore))
-if cross_idx > 0:
-    ax.axvline(cross_idx, color=FAINT, lw=1.0, linestyle="--")
-    ax.annotate(
-        "exploration $\\to$ exploit crossover",
-        xy=(cross_idx, max(Q[cross_idx], explore[cross_idx])),
-        xytext=(cross_idx + 20, 1.6),
-        ha="left",
-        va="center",
-        color=INK,
-        fontsize=10.5,
-        arrowprops=dict(arrowstyle="-", color=FAINT, lw=1.0),
-    )
+# Crossover dot.
+diff = Q - explore
+idx = int(np.argmax(diff > 0))
+if idx > 0:
+    ax.plot(N[idx], Q[idx], marker="o", markersize=6,
+            markerfacecolor=BG, markeredgecolor=INK, mew=1.1, zorder=5)
 
-# Regime labels.
-ax.text(
-    cross_idx * 0.3 if cross_idx else 10,
-    explore[1] * 0.55,
-    "early:  network's prior decides",
-    ha="left",
-    va="center",
-    color=ORANGE,
-    fontsize=11,
-    style="italic",
-)
-ax.text(
-    160,
-    Q.mean() + 0.18,
-    "late:  search's $Q$ takes over",
-    ha="right",
-    va="center",
-    color=BLUE,
-    fontsize=11,
-    style="italic",
-)
-
-ax.set_xlabel("$N(s,a)$  —  visits through this edge", color=INK, fontsize=11)
-ax.set_ylabel("score contribution", color=INK, fontsize=11)
-ax.set_xlim(0, 200)
-ax.set_ylim(0, max(explore.max(), Q.max()) * 1.15)
+# Style: axes with arrows, no top/right spines, light tick marks.
+ax.set_xlim(0, 110)
+ax.set_ylim(0, 2.5)
 ax.spines["left"].set_color(INK)
 ax.spines["bottom"].set_color(INK)
-ax.tick_params(colors=INK, labelsize=10)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
 
-ax.legend(
-    loc="upper right",
-    frameon=False,
-    fontsize=10.5,
-    labelcolor=INK,
-)
+# Axis arrows
+ax.annotate("", xy=(110, 0), xytext=(0, 0),
+            xycoords="data", textcoords="data",
+            arrowprops=dict(arrowstyle="->", color=INK, lw=1.1))
+ax.annotate("", xy=(0, 2.5), xytext=(0, 0),
+            xycoords="data", textcoords="data",
+            arrowprops=dict(arrowstyle="->", color=INK, lw=1.1))
+
+# Axis labels
+ax.text(110, -0.08, "$N(s,a)$", ha="right", va="top",
+        color=INK, fontsize=12, style="italic")
+ax.text(-3, 2.45, "score", ha="right", va="center",
+        color=INK, fontsize=11, style="italic")
 
 out = Path("public/images/eric-jang/puct-dominance-shift.png")
 plt.savefig(out, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=140)
