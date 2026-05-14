@@ -1,13 +1,18 @@
 """Q12 — NFSP and MCTS: same student, opposite time-directions.
 
-Visual: a single time axis. State s sits at the center.
-  - Left: a chain of past states with arrows pointing LEFT
-          (Bellman backups along trajectories that already happened).
-  - Right: a small tree fanning RIGHT into imagined futures
-           (UCT expansion).
+Two-panel layout inspired by Eric's slide 13. No formula text, no
+descriptive captions in the body — the card has those.
 
-No formulas in the visual — the card text holds those. Just the two
-search directions converging on s.
+  Left  (NFSP):  a horizontal chain of past states ending at s plus a
+                 terminal reward r; blue arcs trace the Bellman back-up
+                 leftward through the chain.
+  Right (MCTS):  s on the left with a small tree fanning right into
+                 imagined futures; orange arcs trace the value back-up
+                 from the leaves toward s.
+
+A faint dashed vertical divider separates the two panels. The only
+text in the figure: "NFSP" / "MCTS" at top, "past" / "future" at
+bottom.
 """
 from pathlib import Path
 import sys
@@ -25,60 +30,173 @@ fig, ax = plt.subplots(figsize=(11, 4.8), dpi=140)
 fig.patch.set_facecolor(BG)
 ax.set_facecolor(BG)
 ax.set_xlim(0, 100)
-ax.set_ylim(0, 50)
+ax.set_ylim(0, 56)
 ax.set_aspect("equal")
 ax.axis("off")
 
 
-# Center: state s.
-sx, sy = 50, 28
-ax.add_patch(patches.Circle((sx, sy), 3.0, facecolor=BG, edgecolor=INK, lw=1.4))
-ax.text(sx, sy, "$s$", ha="center", va="center", fontsize=12, color=INK, style="italic")
+# Vertical divider.
+ax.plot([50, 50], [6, 50], color=FAINT, lw=0.8, linestyle="--")
 
-# Past chain on the LEFT: four prior states with leftward Bellman arrows.
-past_xs = [12, 22, 32, 42]
-for x in past_xs:
-    ax.add_patch(patches.Circle((x, sy), 2.2, facecolor=BG, edgecolor=FAINT, lw=1.0))
-# Bellman arrows (leftward, blue).
-for x_to, x_from in zip(past_xs, past_xs[1:] + [sx - 3]):
+
+# ────────── LEFT panel: NFSP — backward in time ──────────
+NFSP_Y = 28
+chain_xs = [8, 18, 28, 38]  # s-3, s-2, s-1, s
+for i, x in enumerate(chain_xs):
+    is_current = i == len(chain_xs) - 1
+    ax.add_patch(
+        patches.Circle(
+            (x, NFSP_Y),
+            2.6,
+            facecolor=BG,
+            edgecolor=INK if is_current else FAINT,
+            lw=1.4 if is_current else 1.0,
+        )
+    )
+    if is_current:
+        ax.text(x, NFSP_Y, "$s$", ha="center", va="center",
+                fontsize=11, color=INK, style="italic")
+
+# Faint forward arrows showing real-time chain (light grey).
+for x1, x2 in zip(chain_xs[:-1], chain_xs[1:]):
     ax.add_patch(
         FancyArrowPatch(
-            (x_from - 2.3, sy + 0.4), (x_to + 2.3, sy + 0.4),
-            arrowstyle="->", color=BLUE, lw=1.6,
-            connectionstyle="arc3,rad=0.30", mutation_scale=12,
+            (x1 + 2.6, NFSP_Y),
+            (x2 - 2.6, NFSP_Y),
+            arrowstyle="->",
+            color=FAINT,
+            lw=0.8,
+            mutation_scale=10,
         )
     )
 
-# Future tree on the RIGHT: fan of children with orange UCT arrows.
-fut_xs = [62, 74, 86]
-fut_ys = [38, 28, 18]
-for fx, fy in zip(fut_xs, fut_ys):
-    ax.add_patch(patches.Circle((fx, fy), 2.0, facecolor=BG, edgecolor=FAINT, lw=1.0))
-    ax.add_patch(
-        FancyArrowPatch(
-            (sx + 3, sy), (fx - 2, fy),
-            arrowstyle="->", color=ORANGE, lw=1.6, mutation_scale=12,
-        )
-    )
-
-# Time axis with arrowheads at both ends.
-ax.annotate(
-    "", xy=(96, 8), xytext=(4, 8),
-    xycoords="data", textcoords="data",
-    arrowprops=dict(arrowstyle="<->", color=INK, lw=1.0),
+# Terminal reward r — small orange square to the right of s.
+r_x = 46
+ax.add_patch(
+    patches.Rectangle((r_x - 1.6, NFSP_Y - 1.6), 3.2, 3.2,
+                      facecolor=ORANGE, edgecolor=ORANGE, lw=0.8)
 )
-ax.text(4, 5, "past", ha="left", va="top", color=INK, fontsize=11, style="italic")
-ax.text(96, 5, "future", ha="right", va="top", color=INK, fontsize=11, style="italic")
+# faint connector from s to r
+ax.add_patch(
+    FancyArrowPatch(
+        (chain_xs[-1] + 2.6, NFSP_Y),
+        (r_x - 1.6, NFSP_Y),
+        arrowstyle="->",
+        color=FAINT,
+        lw=0.8,
+        mutation_scale=10,
+    )
+)
 
-# Inline algorithm labels above the two halves.
-ax.text(28, 45, "NFSP", ha="center", va="center",
+# Blue back-up arcs: leftward, arching above the chain.
+arc_nodes = [(r_x, NFSP_Y)] + [(x, NFSP_Y) for x in reversed(chain_xs)]
+for (x_from, _), (x_to, _) in zip(arc_nodes[:-1], arc_nodes[1:]):
+    ax.add_patch(
+        FancyArrowPatch(
+            (x_from - 1.8, NFSP_Y + 1.5),
+            (x_to + 2.8, NFSP_Y + 1.5),
+            arrowstyle="->",
+            color=BLUE,
+            lw=1.6,
+            mutation_scale=11,
+            connectionstyle="arc3,rad=0.45",
+        )
+    )
+
+# Top + bottom labels.
+ax.text(25, 50, "NFSP", ha="center", va="center",
         color=BLUE, fontsize=12, fontweight="bold")
-ax.text(28, 42, "Bellman backup", ha="center", va="top",
-        color=BLUE, fontsize=10, style="italic")
-ax.text(72, 45, "MCTS", ha="center", va="center",
+ax.text(8, 8, "past", ha="left", va="top",
+        color=INK, fontsize=10.5, style="italic")
+ax.text(46, 8, "now", ha="right", va="top",
+        color=INK, fontsize=10.5, style="italic")
+
+
+# ────────── RIGHT panel: MCTS — forward in time ──────────
+MCTS_Y = 28
+s2_x = 56
+ax.add_patch(
+    patches.Circle((s2_x, MCTS_Y), 2.6, facecolor=BG, edgecolor=INK, lw=1.4)
+)
+ax.text(s2_x, MCTS_Y, "$s$", ha="center", va="center",
+        fontsize=11, color=INK, style="italic")
+
+# Three children in a vertical fan.
+child_x = 72
+child_ys = [40, 28, 16]
+for cy in child_ys:
+    ax.add_patch(
+        patches.Circle((child_x, cy), 1.9, facecolor=BG, edgecolor=FAINT, lw=1.0)
+    )
+    # forward branch from s to child (faint, like the real-time arrows on the left)
+    ax.add_patch(
+        FancyArrowPatch(
+            (s2_x + 2.6, MCTS_Y),
+            (child_x - 1.9, cy),
+            arrowstyle="->",
+            color=FAINT,
+            lw=0.8,
+            mutation_scale=10,
+        )
+    )
+
+# Two leaves per child — orange terminal squares on the right.
+leaf_x = 88
+leaf_offset = 2.6
+for cy in child_ys:
+    for dy in (leaf_offset, -leaf_offset):
+        ly = cy + dy
+        ax.add_patch(
+            patches.Rectangle((leaf_x - 1.6, ly - 1.6), 3.2, 3.2,
+                              facecolor=ORANGE, edgecolor=ORANGE, lw=0.8)
+        )
+        ax.add_patch(
+            FancyArrowPatch(
+                (child_x + 1.9, cy),
+                (leaf_x - 1.6, ly),
+                arrowstyle="->",
+                color=FAINT,
+                lw=0.6,
+                mutation_scale=8,
+            )
+        )
+
+# Orange back-up arcs: one per child, from the child node back to s
+# (the per-leaf back-up is implied by the children's existence).
+for i, cy in enumerate(child_ys):
+    sign = 1 if i == 0 else (-1 if i == 2 else 0)
+    if sign == 0:
+        ax.add_patch(
+            FancyArrowPatch(
+                (child_x - 1.9, cy),
+                (s2_x + 2.6, MCTS_Y),
+                arrowstyle="->",
+                color=ORANGE,
+                lw=1.6,
+                mutation_scale=12,
+            )
+        )
+    else:
+        ax.add_patch(
+            FancyArrowPatch(
+                (child_x - 1.9, cy),
+                (s2_x + 2.0, MCTS_Y + sign * 1.5),
+                arrowstyle="->",
+                color=ORANGE,
+                lw=1.6,
+                mutation_scale=12,
+                connectionstyle=f"arc3,rad={0.25 * sign}",
+            )
+        )
+
+# Top + bottom labels.
+ax.text(75, 50, "MCTS", ha="center", va="center",
         color=ORANGE, fontsize=12, fontweight="bold")
-ax.text(72, 42, "tree rollout", ha="center", va="top",
-        color=ORANGE, fontsize=10, style="italic")
+ax.text(56, 8, "now", ha="left", va="top",
+        color=INK, fontsize=10.5, style="italic")
+ax.text(92, 8, "future", ha="right", va="top",
+        color=INK, fontsize=10.5, style="italic")
+
 
 out = Path("public/images/eric-jang/mcts-nfsp-time-direction.png")
 plt.savefig(out, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=140)

@@ -16,7 +16,6 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
   const [copied, setCopied] = useState(false);
   const slug = episode.slug;
   const cards = totalCardCount(episode);
-  const sectionCount = episode.sections.length;
   const upcoming = !episode.youtubeUrl && !episode.date;
 
   const transcriptHref = `/exports/${slug}/transcript.md`;
@@ -121,9 +120,6 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
               </button>
             </>
           ) : null}
-          <span className="ml-auto text-[0.78rem] text-ink-faint">
-            {sectionCount} section{sectionCount === 1 ? "" : "s"}
-          </span>
         </div>
 
         {episode.note ? (

@@ -90,10 +90,8 @@ MCTS distillation has no credit-assignment problem. Instead of "this game was wo
 
 ### Q12. Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?
 
-- NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*. Teacher = greedy $a$ from learned $Q$.
-- MCTS — search forward in time. UCT tree expansion over trajectories that *haven't happened yet*. Teacher = visit-count distribution.
-
-From the student's perspective the supervision is identical — the teacher's time-direction is invisible.
+- NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*.
+- MCTS — search forward in time. UCT tree expansion over trajectories that *haven't happened yet*.
 
 ![MCTS and NFSP — same student, opposite time-directions](/images/eric-jang/mcts-nfsp-time-direction.png)
 
