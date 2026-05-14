@@ -170,8 +170,6 @@ timestamp: 01:18:14
 
 MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
 
-![Winner-imitation buried in neutral labels vs MCTS dense supervision](/images/eric-jang/winner-imitation-dilution.png)
-
 ---
 
 # Section: MCTS and NFSP — same student, opposite time-directions

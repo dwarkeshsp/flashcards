@@ -86,8 +86,6 @@ Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe 
 
 MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
 
-![Winner-imitation buried in neutral labels vs MCTS dense supervision](/images/eric-jang/winner-imitation-dilution.png)
-
 ### Q12. Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?
 
 - NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*.
