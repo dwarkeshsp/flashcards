@@ -113,7 +113,9 @@ timestamp: 00:44:14
 - Evaluate the leaf node's policy and value.
 - Walk the leaf's value back up to the root (increment each intermediate node's visit count and fold the leaf value into its running average).
 
-![One MCTS simulation](/images/eric-jang/mcts-three-steps.png)
+![One MCTS simulation](/images/eric-jang/mcts-three-steps-paper.png)
+
+*Figure 2 from [Silver et al., 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf).*
 
 ---
 

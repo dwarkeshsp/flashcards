@@ -53,7 +53,9 @@ $$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value:
 - Evaluate the leaf node's policy and value.
 - Walk the leaf's value back up to the root (increment each intermediate node's visit count and fold the leaf value into its running average).
 
-![One MCTS simulation](/images/eric-jang/mcts-three-steps.png)
+![One MCTS simulation](/images/eric-jang/mcts-three-steps-paper.png)
+
+*Figure 2 from [Silver et al., 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf).*
 
 ### Q8. As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:
 
