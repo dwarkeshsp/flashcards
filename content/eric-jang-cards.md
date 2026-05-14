@@ -109,9 +109,9 @@ timestamp: 00:44:14
 
 ### A:
 
-- Descend. Walk down from the root, at each node picking the child whose PUCT score is highest.
-- Expand. Run the neural network on that leaf state once. It returns priors over the leaf's legal moves and a value estimate of who's winning from there.
-- Back up. Walk back up to the root. On every edge you descended through, increment its visit count and fold the new leaf value into its running average.
+- Keep descending until you explore a new leaf node. Walk down from the root, at each node picking the child whose PUCT score is highest.
+- Evaluate the leaf node's policy and value.
+- Walk the leaf's value back up to the root (increment each intermediate node's visit count and fold the leaf value into its running average).
 
 ![One MCTS simulation](/images/eric-jang/mcts-three-steps.png)
 
