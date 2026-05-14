@@ -69,10 +69,10 @@
           "answer_html": "• Neural network: \\(P(s,a)\\) — the policy prior, written into a node once, when that node is first expanded.\n• MCTS node: \\(Q(s,a)\\), \\(N(s)\\), \\(N(s,a)\\) — all running statistics of the search itself."
         },
         {
-          "question_md": "When a simulation reaches a newly evaluated leaf and produces a value $v$, every ancestor edge $(s,a)$ on the path back to the root updates its stored $Q$. What is the update rule, and what statistic does $Q(s,a)$ end up representing?",
-          "answer_md": "$$Q(s,a) \\leftarrow \\frac{N(s,a)\\,Q(s,a) + v}{N(s,a) + 1}, \\qquad N(s,a) \\leftarrow N(s,a) + 1.$$\n\nAn online running mean of the leaf values reached by simulations that passed through this edge. After $k$ such simulations, $Q(s,a)$ is just their arithmetic average.",
-          "question_html": "When a simulation reaches a newly evaluated leaf and produces a value \\(v\\), every ancestor edge \\((s,a)\\) on the path back to the root updates its stored \\(Q\\). What is the update rule, and what statistic does \\(Q(s,a)\\) end up representing?",
-          "answer_html": "\\[Q(s,a) \\leftarrow \\frac{N(s,a)\\,Q(s,a) + v}{N(s,a) + 1}, \\qquad N(s,a) \\leftarrow N(s,a) + 1.\\]\n\nAn online running mean of the leaf values reached by simulations that passed through this edge. After \\(k\\) such simulations, \\(Q(s,a)\\) is just their arithmetic average."
+          "question_md": "When a simulation reaches a newly evaluated leaf and produces a value, every ancestor node on the path back to the root updates its stored $Q$. What statistic does $Q(s,a)$ end up representing?",
+          "answer_md": "An online running mean of the leaf values reached by simulations that passed through this edge.",
+          "question_html": "When a simulation reaches a newly evaluated leaf and produces a value, every ancestor node on the path back to the root updates its stored \\(Q\\). What statistic does \\(Q(s,a)\\) end up representing?",
+          "answer_html": "An online running mean of the leaf values reached by simulations that passed through this edge."
         },
         {
           "question_md": "Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it *won* (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?",

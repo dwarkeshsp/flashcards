@@ -74,11 +74,9 @@ Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node whe
 - Neural network: $P(s,a)$ — the policy prior, written into a node once, when that node is first expanded.
 - MCTS node: $Q(s,a)$, $N(s)$, $N(s,a)$ — all running statistics of the search itself.
 
-### Q10. When a simulation reaches a newly evaluated leaf and produces a value $v$, every ancestor edge $(s,a)$ on the path back to the root updates its stored $Q$. What is the update rule, and what statistic does $Q(s,a)$ end up representing?
+### Q10. When a simulation reaches a newly evaluated leaf and produces a value, every ancestor node on the path back to the root updates its stored $Q$. What statistic does $Q(s,a)$ end up representing?
 
-$$Q(s,a) \leftarrow \frac{N(s,a)\,Q(s,a) + v}{N(s,a) + 1}, \qquad N(s,a) \leftarrow N(s,a) + 1.$$
-
-An online running mean of the leaf values reached by simulations that passed through this edge. After $k$ such simulations, $Q(s,a)$ is just their arithmetic average.
+An online running mean of the leaf values reached by simulations that passed through this edge.
 
 ### Q11. Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it *won* (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?
 

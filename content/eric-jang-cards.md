@@ -152,13 +152,9 @@ Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node whe
 
 timestamp: 01:00:00
 
-## Q: When a simulation reaches a newly evaluated leaf and produces a value $v$, every ancestor edge $(s,a)$ on the path back to the root updates its stored $Q$. What is the update rule, and what statistic does $Q(s,a)$ end up representing?
+## Q: When a simulation reaches a newly evaluated leaf and produces a value, every ancestor node on the path back to the root updates its stored $Q$. What statistic does $Q(s,a)$ end up representing?
 
-### A:
-
-$$Q(s,a) \leftarrow \frac{N(s,a)\,Q(s,a) + v}{N(s,a) + 1}, \qquad N(s,a) \leftarrow N(s,a) + 1.$$
-
-An online running mean of the leaf values reached by simulations that passed through this edge. After $k$ such simulations, $Q(s,a)$ is just their arithmetic average.
+### A: An online running mean of the leaf values reached by simulations that passed through this edge.
 
 ---
 
