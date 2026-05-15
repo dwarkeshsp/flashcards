@@ -3,9 +3,10 @@ slug: eric-jang
 title: Eric Jang
 guest: Eric Jang
 blurb: Building AlphaGo from scratch
-date: 2026-05-08
+date: 2026-05-15
+youtube: https://youtu.be/X_ZVSPcZhtw
+substack: https://dwarkesh.com/p/eric-jang
 transcript: transcripts/eric-jang.md
-flatten: true
 ---
 
 # Editing notes
@@ -15,12 +16,10 @@ flatten: true
   Anki .apkg deck are all generated from it.
 - One card per `## Q:` / `### A:` pair. Card boundaries are `---`
   between cards.
-- The `# Section: …` headers below are an editorial scaffold for
-  grouping cards. With `flatten: true` in the frontmatter they are
-  collapsed into a single rendered section called "All cards". When
-  real timestamps are added, flip `flatten: false` and the parsed
-  sections (with their `timestamp: HH:MM:SS` lines) will render
-  individually.
+- The `# Section: …` headers below correspond to the chapter
+  timestamps from the published episode. Each section has a
+  `timestamp: HH:MM:SS` line that becomes a YouTube deep-link on the
+  episode page.
 - LaTeX is inline `$...$` or block `$$...$$`. Markdown italics work;
   bolding is intentionally avoided.
 - `<!-- TODO(visual): … -->` lines mark animations I think would
@@ -28,82 +27,10 @@ flatten: true
 
 ---
 
-# Section: Basics of the AlphaGo network
+# Section: Monte Carlo Tree Search
 
-timestamp: 00:46:51
-
-## Q: What is the overall purpose of the AlphaGo neural network in the full program?
-
-### A: To guide and prune the MCTS search.
-
----
-
-## Q: The AlphaGo network takes in ___ and outputs both ___ and ___.
-
-### A:
-
-- Input: the current board state.
-- Outputs: a policy — a probability distribution over the legal moves — and a value — the probability the current player will win.
-
-![AlphaGo network as MCTS guide](/images/eric-jang/network-schematic.png)
-
----
-
-## Q: We update the AlphaGo network with per-move training labels. What are these labels?
-
-### A:
-
-- For the policy head: the final MCTS visit distribution at that move.
-- For the value head: who won the game, projected (with appropriate sign flips for self-play) back through every move.
-
----
-
-## Q: The AlphaZero loss is composed of two quantities. What are they conceptually, and mathematically?
-
-### A:
-
-Conceptually:
-
-1. Make the value head predict who actually won.
-2. Make the policy head predict the MCTS visit distribution at that state.
-
-Mathematically, summed over states visited in self-play:
-
-$$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value: MSE vs game outcome } z\in\{-1,+1\}} \;+\; \underbrace{-\,\boldsymbol{\pi}_{\text{MCTS}}(s)^{\top}\log P_\theta(\cdot\mid s)}_{\text{policy: cross-entropy vs MCTS visit distribution}}.$$
-
----
-
-# Section: How the two heads carve up the game tree
-
-timestamp: 00:42:04
-
-## Q: If there are up to ~361 legal moves per turn and a Go game can last ~300 turns, the naive game tree has on the order of $361^{300}$ trajectories. Which axis does the policy head prune, and which does the value head prune?
-
-### A:
-
-- Policy head prunes breadth. $P(a \mid s)$ goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.
-- Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree.
-
-![Two heads, two cuts](/images/eric-jang/breadth-depth-tree.png)
-
----
-
-# Section: Why have a policy head if you already have a value head
-
-timestamp: 00:46:51
-
-## Q: Couldn't we drop the policy head and pick $a^* = \arg\max_a V_\theta(s')$ over the resulting next states $s'$? Why is that a bad idea? Two reasons:
-
-### A:
-
-- To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.
-- You can't easily turn MCTS into a single scalar, and the whole point of training is to distill the MCTS search into the model.
-
----
-
-# Section: Is the MCTS tree preserved between moves
-
-timestamp: 00:44:14
+id: mcts
+timestamp: 00:08:17
 
 ## Q: When AlphaZero is going to make a move, it kicks off MCTS with an empty tree. For each simulation of MCTS (1600 per move), what happens?
 
@@ -118,10 +45,6 @@ timestamp: 00:44:14
 *Figure 2 from [Silver et al., 2017](https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf).*
 
 ---
-
-# Section: PUCT — explore vs exploit, and what lives where
-
-timestamp: 00:32:00
 
 ## Q: As you keep revisiting a node in MCTS, you choose the child node to explore based on which one has the highest PUCT score, which is calculated as:
 
@@ -150,61 +73,53 @@ Thus the MCTS-derived $Q$ is leaned on more to determine the value of a node whe
 
 ---
 
-# Section: How $Q(s,a)$ is updated in an MCTS backup
-
-timestamp: 01:00:00
-
 ## Q: When a simulation reaches a newly evaluated leaf and produces a value, every ancestor node on the path back to the root updates its stored $Q$. What statistic does $Q(s,a)$ end up representing?
 
 ### A: An online running mean of the leaf values reached by simulations that passed through this edge.
 
 ---
 
-# Section: Why winner-imitation plateaus where MCTS distillation doesn't
+# Section: What the neural network does
 
-timestamp: 01:18:14
+id: neural-network
+timestamp: 00:32:04
 
-## Q: Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it *won* (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?
+## Q: What is the overall purpose of the AlphaGo neural network in the full program?
 
-### A: Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe one game is won by a genuinely better move; the other ~50 wins are statistical noise. Imitating winners gives you *one* useful gradient buried inside ~30,000 neutral move labels — drowned out.
-
-MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
+### A: To guide and prune the MCTS search.
 
 ---
 
-# Section: MCTS and NFSP — same student, opposite time-directions
-
-timestamp: 02:19:50
-
-## Q: Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?
+## Q: The AlphaGo network takes in ___ and outputs both ___ and ___.
 
 ### A:
 
-- NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*.
-- MCTS — search forward in time. UCT tree expansion over trajectories that *haven't happened yet*.
+- Input: the current board state.
+- Outputs: a policy — a probability distribution over the legal moves — and a value — the probability the current player will win.
 
-![MCTS and NFSP — same student, opposite time-directions](/images/eric-jang/mcts-nfsp-time-direction.png)
+![AlphaGo network as MCTS guide](/images/eric-jang/network-schematic.png)
 
 ---
 
-# Section: Two reasons MCTS doesn't transfer to LLM reasoning
-
-timestamp: 02:25:20
-
-## Q: In the DeepSeek-R1 paper they said they weren't able to get MCTS to work for LLMs. What were the two big issues?
+## Q: If there are up to ~361 legal moves per turn and a Go game can last ~300 turns, the naive game tree has on the order of $361^{300}$ trajectories. Which axis does the policy head prune, and which does the value head prune?
 
 ### A:
 
-- Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.
-- Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you.
+- Policy head prunes breadth. $P(a \mid s)$ goes into PUCT's exploration term, so MCTS spends ~no visits on obviously bad moves.
+- Value head prunes depth. When you visit a new node, you just take the value head's prediction of winning for granted and percolate it up the MCTS tree.
 
-![Why MCTS doesn't transfer from Go to LLMs](/images/eric-jang/mcts-go-vs-llm.png)
+![Two heads, two cuts](/images/eric-jang/breadth-depth-tree.png)
 
 ---
 
-# Section: Inductive biases — convolution vs recurrence
+## Q: Couldn't we drop the policy head and pick $a^* = \arg\max_a V_\theta(s')$ over the resulting next states $s'$? Why is that a bad idea? Two reasons:
 
-timestamp: 00:47:30
+### A:
+
+- To do argmax over the values of potential next moves, you'd have to run a forward pass of the value network up to 361 times — whereas one forward pass of the policy gives you the distribution over all moves at once.
+- You can't easily turn MCTS into a single scalar, and the whole point of training is to distill the MCTS search into the model.
+
+---
 
 ## Q: AlphaGo, AlphaZero, and KataGo all use convolutional ResNets rather than Transformers. Eric tried Transformers for Go at his scale and couldn't beat ResNets. Why do CNN inductive biases fit Go better?
 
@@ -223,3 +138,72 @@ Eric addendum: "With larger-scale data + compute, transformers can learn these b
 Go is a perfect-information game, so the current board encodes all the relevant information — there's a Nash-equilibrium strategy that depends only on $s$.
 
 In hidden-information games like poker or Diplomacy that breaks: the value of your hand depends on the opponent's *earlier* bluffs, alliances, betting patterns. Now you need an architecture that carries state across time (RNN, or Transformer over a history of states), not just one that attends over space.
+
+---
+
+# Section: Self-play
+
+id: self-play
+timestamp: 01:00:33
+
+## Q: We update the AlphaGo network with per-move training labels. What are these labels?
+
+### A:
+
+- For the policy head: the final MCTS visit distribution at that move.
+- For the value head: who won the game, projected (with appropriate sign flips for self-play) back through every move.
+
+---
+
+## Q: The AlphaZero loss is composed of two quantities. What are they conceptually, and mathematically?
+
+### A:
+
+Conceptually:
+
+1. Make the value head predict who actually won.
+2. Make the policy head predict the MCTS visit distribution at that state.
+
+Mathematically, summed over states visited in self-play:
+
+$$\mathcal{L}(\theta) = \underbrace{\bigl(V_\theta(s) - z\bigr)^2}_{\text{value: MSE vs game outcome } z\in\{-1,+1\}} \;+\; \underbrace{-\,\boldsymbol{\pi}_{\text{MCTS}}(s)^{\top}\log P_\theta(\cdot\mid s)}_{\text{policy: cross-entropy vs MCTS visit distribution}}.$$
+
+---
+
+# Section: Alternate RL approaches
+
+id: alt-rl
+timestamp: 01:25:38
+
+## Q: Eric ran a self-play loop that used MCTS for action selection but trained the policy net only on the moves from games it *won* (REINFORCE-style winner-imitation). It plateaued at ~50% against KataGo. Why?
+
+### A: Two evenly-matched policies play 100 games of ~300 moves each. By chance, maybe one game is won by a genuinely better move; the other ~50 wins are statistical noise. Imitating winners gives you *one* useful gradient buried inside ~30,000 neutral move labels — drowned out.
+
+MCTS distillation has no credit-assignment problem. Instead of "this game was won, copy these moves," it says: *at every state you visited, here is a strictly better move than the one you played.* Every move becomes a dense per-state supervision target — like DAgger interventions in imitation learning.
+
+---
+
+## Q: Both MCTS (AlphaZero) and NFSP (AlphaStar) relabel each visited state $s$ with a better action $a^*$ for the student policy to imitate. They differ only in where $a^*$ comes from. What is the duality?
+
+### A:
+
+- NFSP — search backward in time. Bellman/TD backup over trajectories that *already happened*.
+- MCTS — search forward in time. UCT tree expansion over trajectories that *haven't happened yet*.
+
+![MCTS and NFSP — same student, opposite time-directions](/images/eric-jang/mcts-nfsp-time-direction.png)
+
+---
+
+# Section: Why doesn't MCTS work for LLMs
+
+id: mcts-llms
+timestamp: 01:45:47
+
+## Q: In the DeepSeek-R1 paper they said they weren't able to get MCTS to work for LLMs. What were the two big issues?
+
+### A:
+
+- Unbounded breadth. The number of legal actions from a given state (i.e. what further thoughts one could have started from a partial reasoning trace) is essentially unbounded — whereas for Go, there's at most 361 legal next moves.
+- Harder to prune depth. Much harder to train a value model to anticipate whether a partial coding or thinking trajectory will result in success than whether a given board state is favorable to you.
+
+![Why MCTS doesn't transfer from Go to LLMs](/images/eric-jang/mcts-go-vs-llm.png)

@@ -3,20 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Episode, totalCardCount } from "@/lib/types";
-import {
-  BackIcon,
-  CheckIcon,
-  CopyIcon,
-  DownloadIcon,
-  SubstackIcon,
-  YouTubeIcon,
-} from "./Icons";
+import { BackIcon, CheckIcon, CopyIcon, DownloadIcon } from "./Icons";
 
 export function EpisodeHeader({ episode }: { episode: Episode }) {
   const [copied, setCopied] = useState(false);
   const slug = episode.slug;
   const cards = totalCardCount(episode);
   const upcoming = !episode.youtubeUrl && !episode.date;
+  const youtubeEmbedUrl = episode.youtubeUrl ? toYouTubeEmbed(episode.youtubeUrl) : null;
 
   const transcriptHref = `/exports/${slug}/transcript.md`;
 
@@ -64,36 +58,37 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
         </div>
 
         <h1 className="mt-2 font-serif text-[2rem] font-medium leading-[1.1] tracking-tight text-ink sm:text-[2.4rem]">
-          {episode.title}
-        </h1>
-        <p className="mt-3 max-w-prose text-[1.0125rem] leading-relaxed text-ink-muted">
-          {episode.blurb}
-        </p>
-
-        <div className="mt-6 flex flex-wrap items-center gap-2.5">
-          {episode.youtubeUrl ? (
-            <a
-              href={episode.youtubeUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center gap-2 rounded-md bg-ink px-3.5 py-2 text-[0.875rem] font-medium text-paper transition-colors hover:bg-accent"
-            >
-              <YouTubeIcon />
-              Watch on YouTube
-            </a>
-          ) : null}
           {episode.substackUrl ? (
             <a
               href={episode.substackUrl}
               target="_blank"
               rel="noreferrer noopener"
-              className="inline-flex items-center gap-2 rounded-md border border-ink/15 bg-paper px-3.5 py-2 text-[0.875rem] font-medium text-ink transition-colors hover:border-ink/40 hover:bg-white"
+              className="transition-colors hover:text-accent"
+              title="Read on Substack"
             >
-              <SubstackIcon />
-              Read on Substack
+              {episode.title}
             </a>
-          ) : null}
-        </div>
+          ) : (
+            episode.title
+          )}
+        </h1>
+        <p className="mt-3 max-w-prose text-[1.0125rem] leading-relaxed text-ink-muted">
+          {episode.blurb}
+        </p>
+
+        {youtubeEmbedUrl ? (
+          <div className="mt-6 aspect-video w-full overflow-hidden rounded-md border border-rule bg-ink/5">
+            <iframe
+              src={youtubeEmbedUrl}
+              title={`${episode.title} on YouTube`}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+              className="h-full w-full"
+            />
+          </div>
+        ) : null}
 
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
           <span className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-ink-faint">
@@ -145,6 +140,24 @@ function ExportLink({ href, label }: { href: string; label: string }) {
       </span>
     </a>
   );
+}
+
+function toYouTubeEmbed(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let id: string | null = null;
+    if (u.hostname === "youtu.be") {
+      id = u.pathname.slice(1).split("/")[0] || null;
+    } else if (u.hostname.endsWith("youtube.com")) {
+      id = u.searchParams.get("v");
+      if (!id && u.pathname.startsWith("/embed/")) {
+        id = u.pathname.slice("/embed/".length).split("/")[0] || null;
+      }
+    }
+    return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+  } catch {
+    return null;
+  }
 }
 
 function formatDate(iso: string): string {
