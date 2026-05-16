@@ -12,15 +12,25 @@ export type Section = {
   cards: Card[];
 };
 
+// Decks come in two flavors:
+//   - "lecture": a blackboard lecture episode (has a guest, a YouTube
+//     video, and usually a transcript).
+//   - "subject": a topic-level deck attached to a blog post or
+//     standalone investigation (no podcast video, no transcript).
+export type DeckKind = "lecture" | "subject";
+
 export type Episode = {
+  // Optional discriminator. Defaults to "lecture" when omitted so all
+  // existing episode files keep behaving the same.
+  kind?: DeckKind;
   // URL slug: `/<slug>/`. Also used for per-episode export paths.
   slug: string;
-  // Full title shown on the episode page header, e.g.
-  // "Reiner Pope on the Dwarkesh Podcast".
+  // Full title shown on the deck page header.
   title: string;
-  // Guest name as it appears in the episode list, e.g. "Reiner Pope".
-  guest: string;
-  // One-line blurb shown on both the episode list and episode page.
+  // For lectures, the guest name (e.g. "Reiner Pope"). Omitted for
+  // subjects, where the title carries the identity.
+  guest?: string;
+  // One-line blurb shown on both the deck list and the deck page.
   blurb: string;
   // Typically "YYYY-MM" or "YYYY-MM-DD". Undefined for not-yet-aired episodes.
   date?: string;
@@ -31,7 +41,7 @@ export type Episode = {
   transcriptPath?: string;
   // Optional typo fixes applied when copying the transcript export.
   transcriptFixes?: Array<{ from: string; to: string }>;
-  // Optional banner shown at the top of the episode page (for context such as
+  // Optional banner shown at the top of the deck page (for context such as
   // "Prepared before the episode aired").
   note?: string;
   sections: Section[];

@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "slug": "chips",
+    "title": "Chips",
+    "blurb": "Multiplexers, adders, MACs, RTL-to-GDS, and the SRAM vs. register file trade-off.",
+    "date": null,
+    "youtube": null,
+    "substack": null
+  },
+  "sections": [
+    {
+      "id": "gates-and-arithmetic",
+      "timestamp": null,
+      "title": "Gates and arithmetic",
+      "cards": [
+        {
+          "question_md": "What kind of operation does a MUX implement?",
+          "answer_md": "Selection — a ternary operator for two inputs.\n\n![3-to-1 MUX as AND/OR tree on select signals](/images/chips/mux.png)",
+          "question_html": "What kind of operation does a MUX implement?",
+          "answer_html": "Selection — a ternary operator for two inputs.\n\n<img src=\"mux.png\" alt=\"3-to-1 MUX as AND/OR tree on select signals\">"
+        },
+        {
+          "question_md": "What is the difference between a half adder and a full adder?",
+          "answer_md": "A full adder considers the carry-in; a half adder doesn't.",
+          "question_html": "What is the difference between a half adder and a full adder?",
+          "answer_html": "A full adder considers the carry-in; a half adder doesn't."
+        },
+        {
+          "question_md": "What would a 4-bit ripple-carry adder made of 1-bit full adders look like?",
+          "answer_md": "A horizontal chain of 4 full adders. Each takes a pair of bits plus the previous adder's carry-out as its carry-in, and emits a sum bit plus a carry-out that feeds the next adder.\n\n![4-bit ripple-carry adder](/images/chips/ripple-carry-adder.png)",
+          "question_html": "What would a 4-bit ripple-carry adder made of 1-bit full adders look like?",
+          "answer_html": "A horizontal chain of 4 full adders. Each takes a pair of bits plus the previous adder's carry-out as its carry-in, and emits a sum bit plus a carry-out that feeds the next adder.\n\n<img src=\"ripple-carry-adder.png\" alt=\"4-bit ripple-carry adder\">"
+        },
+        {
+          "question_md": "Walk through the calculation of the area taken up by an int8 × int8 multiply-accumulate. Relevant gate counts: full adder = 1.0, 2:1 mux = 0.3.",
+          "answer_md": "Consider the simpler 4×4 case: $1010 \\cdot 1110 + z$ (with $z$ the accumulate).\n\nThis breaks down into\n\n$$1 \\cdot (1110 \\ll 3) + 0 \\cdot (1110 \\ll 2) + 1 \\cdot (1110 \\ll 1) + 0 \\cdot 1110 + z.$$\n\nEach of those is in turn a mux:\n\n$$(1\\,?\\,1110 \\ll 3 : 0) + (0\\,?\\,1110 \\ll 2 : 0) + (1\\,?\\,1110 \\ll 1 : 0) + (0\\,?\\,1110 : 0) + z.$$\n\nSo you need as many adds and muxes as there are digits in the first number.\n\nThe width of both gates has to be twice the width of the biggest number, since an 8-bit × 8-bit product can be 16 bits wide.\n\n$$(8 \\cdot 0.3 \\cdot 16) + (8 \\cdot 1.0 \\cdot 16) = 8 \\cdot 1.3 \\cdot 16 = 166.4.$$",
+          "question_html": "Walk through the calculation of the area taken up by an int8 × int8 multiply-accumulate. Relevant gate counts: full adder = 1.0, 2:1 mux = 0.3.",
+          "answer_html": "Consider the simpler 4×4 case: \\(1010 \\cdot 1110 + z\\) (with \\(z\\) the accumulate).\n\nThis breaks down into\n\n\\[1 \\cdot (1110 \\ll 3) + 0 \\cdot (1110 \\ll 2) + 1 \\cdot (1110 \\ll 1) + 0 \\cdot 1110 + z.\\]\n\nEach of those is in turn a mux:\n\n\\[(1\\,?\\,1110 \\ll 3 : 0) + (0\\,?\\,1110 \\ll 2 : 0) + (1\\,?\\,1110 \\ll 1 : 0) + (0\\,?\\,1110 : 0) + z.\\]\n\nSo you need as many adds and muxes as there are digits in the first number.\n\nThe width of both gates has to be twice the width of the biggest number, since an 8-bit × 8-bit product can be 16 bits wide.\n\n\\[(8 \\cdot 0.3 \\cdot 16) + (8 \\cdot 1.0 \\cdot 16) = 8 \\cdot 1.3 \\cdot 16 = 166.4.\\]"
+        },
+        {
+          "question_md": "Visualize how you can use a fused multiply-add to compute the dot product of two vectors.",
+          "answer_md": "For two length-$N$ vectors, run $N$ sequential FMAs: $\\text{acc} \\leftarrow a_i \\cdot b_i + \\text{acc}$ for $i = 0, \\dots, N - 1$. The accumulator ends up holding $\\sum_i a_i b_i$.\n\n![Chained FMAs computing a dot product](/images/chips/fma-dot-product.png)",
+          "question_html": "Visualize how you can use a fused multiply-add to compute the dot product of two vectors.",
+          "answer_html": "For two length-\\(N\\) vectors, run \\(N\\) sequential FMAs: \\(\\text{acc} \\leftarrow a_i \\cdot b_i + \\text{acc}\\) for \\(i = 0, \\dots, N - 1\\). The accumulator ends up holding \\(\\sum_i a_i b_i\\).\n\n<img src=\"fma-dot-product.png\" alt=\"Chained FMAs computing a dot product\">"
+        }
+      ]
+    },
+    {
+      "id": "rtl-to-gds",
+      "timestamp": null,
+      "title": "RTL to GDS, clock speed, memory",
+      "cards": [
+        {
+          "question_md": "Walk through the 5 steps of the RTL-to-GDS PD flow.",
+          "answer_md": "1. Logic synthesis: compile RTL → technology-independent graph of universal gates (NAND-ish).\n2. Technology mapping: collapse the graph by pattern-matching the larger patterns of TSMC's standard cell library onto it (\"regex for trees\") → technology-dependent netlist.\n3. Placement: embed cells in 2D minimizing wire length (spring / cost-function optimization).\n4. Routing: connect placed cells with wires on stacked copper layers (Manhattan-only).\n5. GDS-out: lower placement + routing to polygons (doping, etch, metal) → mask data for TSMC.",
+          "question_html": "Walk through the 5 steps of the RTL-to-GDS PD flow.",
+          "answer_html": "1. Logic synthesis: compile RTL → technology-independent graph of universal gates (NAND-ish).\n2. Technology mapping: collapse the graph by pattern-matching the larger patterns of TSMC's standard cell library onto it (\"regex for trees\") → technology-dependent netlist.\n3. Placement: embed cells in 2D minimizing wire length (spring / cost-function optimization).\n4. Routing: connect placed cells with wires on stacked copper layers (Manhattan-only).\n5. GDS-out: lower placement + routing to polygons (doping, etch, metal) → mask data for TSMC."
+        },
+        {
+          "question_md": "Why can two chips on the same TSMC node run at 4 GHz vs 5 GHz?",
+          "answer_md": "Clock speed is set by the critical path — the longest delay between any two registers (wire plus logic cost). Two chips on the same node can have a different layout, affecting this quantity.",
+          "question_html": "Why can two chips on the same TSMC node run at 4 GHz vs 5 GHz?",
+          "answer_html": "Clock speed is set by the critical path — the longest delay between any two registers (wire plus logic cost). Two chips on the same node can have a different layout, affecting this quantity."
+        },
+        {
+          "question_md": "What is the tradeoff between registers and SRAM?",
+          "answer_md": "SRAM is much smaller per bit but rigid (1R xor 1W per cycle); register files are bigger per bit but flexible (cheap to add ports, no minimum size).",
+          "question_html": "What is the tradeoff between registers and SRAM?",
+          "answer_html": "SRAM is much smaller per bit but rigid (1R xor 1W per cycle); register files are bigger per bit but flexible (cheap to add ports, no minimum size)."
+        },
+        {
+          "question_md": "Why can you only read OR write one column of an SRAM array per cycle?",
+          "answer_md": "Because of how it's implemented: an SRAM is a hand-designed macro with exactly one decoder + one set of bit lines wired into the grid.\n\n![SRAM array layout: one decoder, shared word/bit lines](/images/chips/sram-array.png)",
+          "question_html": "Why can you only read OR write one column of an SRAM array per cycle?",
+          "answer_html": "Because of how it's implemented: an SRAM is a hand-designed macro with exactly one decoder + one set of bit lines wired into the grid.\n\n<img src=\"sram-array.png\" alt=\"SRAM array layout: one decoder, shared word/bit lines\">"
+        }
+      ]
+    }
+  ]
+}

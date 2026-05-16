@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "slug": "pretraining",
+    "title": "Pretraining parallelisms and failed runs",
+    "blurb": "Why pretraining runs fail, and the chain of problems and fixes behind FSDP / pipeline / tensor parallelism.",
+    "date": null,
+    "youtube": null,
+    "substack": "https://www.dwarkesh.com/p/notes-on-pretraining-parallelisms"
+  },
+  "sections": [
+    {
+      "id": "why-runs-fail",
+      "timestamp": null,
+      "title": "Why pretraining runs fail",
+      "cards": [
+        {
+          "question_md": "Why is breaking causality in training so bad?",
+          "answer_md": "The model just learns the trivial solution of copying the answer from the output, and the gradient carries no useful signal.",
+          "question_html": "Why is breaking causality in training so bad?",
+          "answer_html": "The model just learns the trivial solution of copying the answer from the output, and the gradient carries no useful signal."
+        },
+        {
+          "question_md": "What is expert choice, and why does it break causality?",
+          "answer_md": "You split the tokens across experts by which tokens each expert most strongly prefers, so every expert ends up with roughly the same number of tokens.\n\nBut which expert token $n$ gets allocated to can depend on which expert token $n + k$ might be routed to.",
+          "question_html": "What is expert choice, and why does it break causality?",
+          "answer_html": "You split the tokens across experts by which tokens each expert most strongly prefers, so every expert ends up with roughly the same number of tokens.\n\nBut which expert token \\(n\\) gets allocated to can depend on which expert token \\(n + k\\) might be routed to."
+        },
+        {
+          "question_md": "What is token dropping, and why does it break causality?",
+          "answer_md": "Experts ignore the tokens in their batch that rank weakly for them, in order to avoid overflowing their padding budget.\n\nThis breaks causality because a later token being more strongly matched to an expert can cause an earlier token to be dropped.",
+          "question_html": "What is token dropping, and why does it break causality?",
+          "answer_html": "Experts ignore the tokens in their batch that rank weakly for them, in order to avoid overflowing their padding budget.\n\nThis breaks causality because a later token being more strongly matched to an expert can cause an earlier token to be dropped."
+        },
+        {
+          "question_md": "Why is bias much worse than variance in training?",
+          "answer_md": "Variance can average out, but bias compounds.",
+          "question_html": "Why is bias much worse than variance in training?",
+          "answer_html": "Variance can average out, but bias compounds."
+        },
+        {
+          "question_md": "Name the rumored reasons why the Llama 4, Gemini 2 Pro, and GPT-4 training runs got fucked up, respectively.",
+          "answer_md": "- Llama 4: expert choice\n- Gemini 2 Pro: token dropping\n- GPT-4: swamping by accumulator (FP16 collectives losing small gradients to a large running sum)",
+          "question_html": "Name the rumored reasons why the Llama 4, Gemini 2 Pro, and GPT-4 training runs got fucked up, respectively.",
+          "answer_html": "• Llama 4: expert choice\n• Gemini 2 Pro: token dropping\n• GPT-4: swamping by accumulator (FP16 collectives losing small gradients to a large running sum)"
+        }
+      ]
+    },
+    {
+      "id": "collectives",
+      "timestamp": null,
+      "title": "Collectives",
+      "cards": [
+        {
+          "question_md": "What happens in an all-gather?",
+          "answer_md": "Every GPU starts with a different shard. Afterwards, every GPU has the full concatenated result.",
+          "question_html": "What happens in an all-gather?",
+          "answer_html": "Every GPU starts with a different shard. Afterwards, every GPU has the full concatenated result."
+        },
+        {
+          "question_md": "What happens in an all-reduce?",
+          "answer_md": "Each GPU ends up with the element-wise reduction (i.e. sum) across every GPU.",
+          "question_html": "What happens in an all-reduce?",
+          "answer_html": "Each GPU ends up with the element-wise reduction (i.e. sum) across every GPU."
+        },
+        {
+          "question_md": "What happens in a reduce-scatter?",
+          "answer_md": "Each GPU ends up with its $1/K$ shard of the element-wise reduced result.\n\nStrictly cheaper than all-reduce because you skip the final all-gather.\n\n![All-reduce vs reduce-scatter vs all-gather](/images/pretraining/collectives.png)",
+          "question_html": "What happens in a reduce-scatter?",
+          "answer_html": "Each GPU ends up with its \\(1/K\\) shard of the element-wise reduced result.\n\nStrictly cheaper than all-reduce because you skip the final all-gather.\n\n<img src=\"collectives.png\" alt=\"All-reduce vs reduce-scatter vs all-gather\">"
+        },
+        {
+          "question_md": "Time cost of an all-gather within one domain of $N$ GPUs, where $B$ is the total payload and $W$ is per-GPU egress bandwidth?",
+          "answer_md": "$$T_{\\text{AllGather}} = \\frac{B \\cdot (N - 1)}{W \\cdot N}$$",
+          "question_html": "Time cost of an all-gather within one domain of \\(N\\) GPUs, where \\(B\\) is the total payload and \\(W\\) is per-GPU egress bandwidth?",
+          "answer_html": "\\[T_{\\text{AllGather}} = \\frac{B \\cdot (N - 1)}{W \\cdot N}\\]"
+        },
+        {
+          "question_md": "Time cost of an all-to-all within one domain of $N$ GPUs is\n\n$$T_{\\text{AllToAll}} = \\frac{B \\cdot (N - 1)}{W \\cdot N^2} \\approx \\frac{B}{W \\cdot N}.$$\n\nExplain why.",
+          "answer_md": "Each GPU starts with $B / N$ of info. It needs to send $1/N$ of that to each of the $N - 1$ other GPUs.",
+          "question_html": "Time cost of an all-to-all within one domain of \\(N\\) GPUs is\n\n\\[T_{\\text{AllToAll}} = \\frac{B \\cdot (N - 1)}{W \\cdot N^2} \\approx \\frac{B}{W \\cdot N}.\\]\n\nExplain why.",
+          "answer_html": "Each GPU starts with \\(B / N\\) of info. It needs to send \\(1/N\\) of that to each of the \\(N - 1\\) other GPUs."
+        }
+      ]
+    },
+    {
+      "id": "parallelisms",
+      "timestamp": null,
+      "title": "Parallelisms",
+      "cards": [
+        {
+          "question_md": "What is the problem with data parallelism alone?",
+          "answer_md": "Each GPU only has a limited amount of HBM — a B300 is 288 GB — and this is not enough to store the weights as models get bigger, much less their activations.",
+          "question_html": "What is the problem with data parallelism alone?",
+          "answer_html": "Each GPU only has a limited amount of HBM — a B300 is 288 GB — and this is not enough to store the weights as models get bigger, much less their activations."
+        },
+        {
+          "question_md": "How does fully sharded data parallelism (FSDP) work?",
+          "answer_md": "Each GPU stores only $1/N$ of the parameters of each layer. Before processing a layer, you all-gather the full layer's parameters from all the GPUs. After processing, each GPU discards the gathered parameters.",
+          "question_html": "How does fully sharded data parallelism (FSDP) work?",
+          "answer_html": "Each GPU stores only \\(1/N\\) of the parameters of each layer. Before processing a layer, you all-gather the full layer's parameters from all the GPUs. After processing, each GPU discards the gathered parameters."
+        },
+        {
+          "question_md": "Why is it much more trivial to overlap compute and comms for FSDP than it is for, say, expert or tensor parallelism?",
+          "answer_md": "The only thing being communicated is the weights, which don't depend on what happened in the layer before, so you can start all-gathering the next layer while still computing the current one.\n\nTensor and expert parallelism, by contrast, must share activations for one layer before processing the next.",
+          "question_html": "Why is it much more trivial to overlap compute and comms for FSDP than it is for, say, expert or tensor parallelism?",
+          "answer_html": "The only thing being communicated is the weights, which don't depend on what happened in the layer before, so you can start all-gathering the next layer while still computing the current one.\n\nTensor and expert parallelism, by contrast, must share activations for one layer before processing the next."
+        },
+        {
+          "question_md": "Why does FSDP only have a 50% comms volume overhead over vanilla DP? You'd think having to all-gather every layer's full weights, use them for one matmul, then throw them away, would be hugely taxing.",
+          "answer_md": "In regular DP, you still need an all-reduce after every layer of the backward pass to sync the batch's gradients across all GPUs. That all-reduce has comms volume $\\text{params} \\times 2$.\n\nFSDP adds all-gathers — one per layer in the forward pass, one per layer in the backward pass. But an all-gather is half the comms volume of an all-reduce. So naive FSDP comms volume ends up being $\\text{params} \\times 4$ (all-gather forward and back, plus all-reduce on back).\n\nYou can do even better: since each gradient shard only needs to end up on the one GPU that owns it, replace the all-reduce with a reduce-scatter (which skips the final broadcast step). That gets you to $\\text{params} \\times 3$ total — a 50% overhead over vanilla DP.",
+          "question_html": "Why does FSDP only have a 50% comms volume overhead over vanilla DP? You'd think having to all-gather every layer's full weights, use them for one matmul, then throw them away, would be hugely taxing.",
+          "answer_html": "In regular DP, you still need an all-reduce after every layer of the backward pass to sync the batch's gradients across all GPUs. That all-reduce has comms volume \\(\\text{params} \\times 2\\).\n\nFSDP adds all-gathers — one per layer in the forward pass, one per layer in the backward pass. But an all-gather is half the comms volume of an all-reduce. So naive FSDP comms volume ends up being \\(\\text{params} \\times 4\\) (all-gather forward and back, plus all-reduce on back).\n\nYou can do even better: since each gradient shard only needs to end up on the one GPU that owns it, replace the all-reduce with a reduce-scatter (which skips the final broadcast step). That gets you to \\(\\text{params} \\times 3\\) total — a 50% overhead over vanilla DP."
+        },
+        {
+          "question_md": "Why can MFU totally crater as you scale the number of GPUs on FSDP? Why did Dylan joke that FSDP is for the GPU poor?",
+          "answer_md": "Compute time decreases as you add more GPUs, but comms time does not.",
+          "question_html": "Why can MFU totally crater as you scale the number of GPUs on FSDP? Why did Dylan joke that FSDP is for the GPU poor?",
+          "answer_html": "Compute time decreases as you add more GPUs, but comms time does not."
+        },
+        {
+          "question_md": "Define the critical batch size.",
+          "answer_md": "The batch size beyond which doubling the batch stops halving the number of steps to reach a target loss.",
+          "question_html": "Define the critical batch size.",
+          "answer_html": "The batch size beyond which doubling the batch stops halving the number of steps to reach a target loss."
+        },
+        {
+          "question_md": "Why does FSDP set a batch size floor?",
+          "answer_md": "FSDP is data-parallel, so each GPU processes at least one sequence. Attention is computed within a sequence and can't (easily) be split across GPUs.",
+          "question_html": "Why does FSDP set a batch size floor?",
+          "answer_html": "FSDP is data-parallel, so each GPU processes at least one sequence. Attention is computed within a sequence and can't (easily) be split across GPUs."
+        },
+        {
+          "question_md": "Why do \"bubbles\" emerge when pipeline parallelism is used during training?",
+          "answer_md": "At the beginning of the batch, the GPUs dedicated to the final layers aren't being used; at the end of the batch, the GPUs dedicated to the first layers aren't being used.\n\nYou can't overlap batches to fix this because you need to consolidate gradients and update the model before processing the next batch.",
+          "question_html": "Why do \"bubbles\" emerge when pipeline parallelism is used during training?",
+          "answer_html": "At the beginning of the batch, the GPUs dedicated to the final layers aren't being used; at the end of the batch, the GPUs dedicated to the first layers aren't being used.\n\nYou can't overlap batches to fix this because you need to consolidate gradients and update the model before processing the next batch."
+        }
+      ]
+    }
+  ]
+}

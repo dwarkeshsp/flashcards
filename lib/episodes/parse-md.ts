@@ -12,8 +12,9 @@
 //   ---
 //   slug: eric-jang
 //   title: Eric Jang
-//   guest: Eric Jang
+//   guest: Eric Jang             # required for lectures, omit for subjects
 //   blurb: Building AlphaGo from scratch
+//   kind: lecture                 # optional; "lecture" (default) or "subject"
 //   date: 2026-05-08              # optional
 //   transcript: transcripts/...   # optional
 //   youtube: https://...          # optional
@@ -65,12 +66,13 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Card, Episode, Section } from "../types";
+import type { Card, DeckKind, Episode, Section } from "../types";
 
 type Frontmatter = {
+  kind?: DeckKind;
   slug: string;
   title: string;
-  guest: string;
+  guest?: string;
   blurb: string;
   date?: string;
   transcript?: string;
@@ -80,7 +82,7 @@ type Frontmatter = {
   flatten?: boolean;
 };
 
-const REQUIRED_KEYS: (keyof Frontmatter)[] = ["slug", "title", "guest", "blurb"];
+const REQUIRED_KEYS: (keyof Frontmatter)[] = ["slug", "title", "blurb"];
 
 function parseFrontmatter(text: string, sourcePath: string): {
   frontmatter: Frontmatter;
@@ -114,10 +116,13 @@ function parseFrontmatter(text: string, sourcePath: string): {
       throw new Error(`${sourcePath}: missing required frontmatter \`${k}\``);
     }
   }
+  const kind =
+    raw.kind === "subject" || raw.kind === "lecture" ? raw.kind : undefined;
   const fm: Frontmatter = {
+    kind,
     slug: raw.slug,
     title: raw.title,
-    guest: raw.guest,
+    guest: raw.guest || undefined,
     blurb: raw.blurb,
     date: raw.date,
     transcript: raw.transcript,
@@ -297,6 +302,7 @@ export function parseEpisodeMd(relPath: string): Episode {
   }
 
   return {
+    kind: frontmatter.kind,
     slug: frontmatter.slug,
     title: frontmatter.title,
     guest: frontmatter.guest,

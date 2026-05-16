@@ -25,31 +25,29 @@ export function SectionView({
   return (
     <section id={section.id} className="scroll-mt-6 pb-14">
       <div className="mb-3">
-        <div className="flex items-baseline justify-between gap-3">
-          {section.timestamp ? (
-            youtubeTimestamp ? (
-              <a
-                href={youtubeTimestamp}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-mono text-[0.78rem] tabular-nums text-ink-faint transition-colors hover:text-accent"
-                title="Jump to this section on YouTube"
-              >
-                {section.timestamp}
-              </a>
-            ) : (
-              <span className="font-mono text-[0.78rem] tabular-nums text-ink-faint">
-                {section.timestamp}
-              </span>
-            )
+        {section.timestamp ? (
+          youtubeTimestamp ? (
+            <a
+              href={youtubeTimestamp}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="font-mono text-[0.78rem] tabular-nums text-ink-faint transition-colors hover:text-accent"
+              title="Jump to this section on YouTube"
+            >
+              {section.timestamp}
+            </a>
           ) : (
-            <span />
-          )}
+            <span className="font-mono text-[0.78rem] tabular-nums text-ink-faint">
+              {section.timestamp}
+            </span>
+          )
+        ) : null}
+        <div className={`flex items-baseline justify-between gap-3 ${section.timestamp ? "mt-1" : ""}`}>
+          <h2 className="font-serif text-[1.55rem] font-medium leading-tight tracking-tight text-ink">
+            {section.title}
+          </h2>
           {headerExtra}
         </div>
-        <h2 className="mt-1 font-serif text-[1.55rem] font-medium leading-tight tracking-tight text-ink">
-          {section.title}
-        </h2>
       </div>
 
       {section.cards.length === 0 ? (

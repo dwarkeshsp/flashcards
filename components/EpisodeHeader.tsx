@@ -9,7 +9,8 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
   const [copied, setCopied] = useState(false);
   const slug = episode.slug;
   const cards = totalCardCount(episode);
-  const upcoming = !episode.youtubeUrl && !episode.date;
+  const isSubject = episode.kind === "subject";
+  const upcoming = !isSubject && !episode.youtubeUrl && !episode.date;
   const youtubeEmbedUrl = episode.youtubeUrl ? toYouTubeEmbed(episode.youtubeUrl) : null;
 
   const transcriptHref = `/exports/${slug}/transcript.md`;
@@ -26,6 +27,26 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
     }
   };
 
+  const metaItems: React.ReactNode[] = [];
+  if (episode.guest) metaItems.push(<span key="guest">{episode.guest}</span>);
+  if (episode.date)
+    metaItems.push(
+      <span key="date" className="tabular-nums">
+        {formatDate(episode.date)}
+      </span>,
+    );
+  metaItems.push(
+    <span key="cards" className="tabular-nums">
+      {cards} card{cards === 1 ? "" : "s"}
+    </span>,
+  );
+  if (upcoming)
+    metaItems.push(
+      <span key="upcoming" className="text-accent">
+        Upcoming
+      </span>,
+    );
+
   return (
     <header className="border-b border-rule bg-paper/95 backdrop-blur">
       <div className="mx-auto max-w-3xl px-5 pt-6 pb-6 sm:px-8 sm:pt-8 sm:pb-7">
@@ -34,27 +55,16 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
           className="inline-flex items-center gap-1.5 text-[0.78rem] text-ink-faint transition-colors hover:text-ink"
         >
           <BackIcon />
-          <span>All episodes</span>
+          <span>All flashcards</span>
         </Link>
 
         <div className="mt-7 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-ink-faint">
-          <span>{episode.guest}</span>
-          {episode.date ? (
-            <>
-              <span className="text-rule">·</span>
-              <span className="tabular-nums">{formatDate(episode.date)}</span>
-            </>
-          ) : null}
-          <span className="text-rule">·</span>
-          <span className="tabular-nums">
-            {cards} card{cards === 1 ? "" : "s"}
-          </span>
-          {upcoming ? (
-            <>
-              <span className="text-rule">·</span>
-              <span className="text-accent">Upcoming</span>
-            </>
-          ) : null}
+          {metaItems.map((item, i) => (
+            <span key={i} className="contents">
+              {i > 0 ? <span className="text-rule">·</span> : null}
+              {item}
+            </span>
+          ))}
         </div>
 
         <h1 className="mt-2 font-serif text-[2rem] font-medium leading-[1.1] tracking-tight text-ink sm:text-[2.4rem]">
@@ -64,7 +74,7 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
               target="_blank"
               rel="noreferrer noopener"
               className="transition-colors hover:text-accent"
-              title="Read on Substack"
+              title={isSubject ? "Read the post" : "Read on Substack"}
             >
               {episode.title}
             </a>
@@ -75,6 +85,20 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
         <p className="mt-3 max-w-prose text-[1.0125rem] leading-relaxed text-ink-muted">
           {episode.blurb}
         </p>
+
+        {isSubject && episode.substackUrl ? (
+          <a
+            href={episode.substackUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="mt-3 inline-flex items-center gap-1 text-[0.875rem] text-ink-muted transition-colors hover:text-accent"
+          >
+            <span className="underline decoration-rule decoration-1 underline-offset-[3px] hover:decoration-accent">
+              Read the post
+            </span>
+            <span aria-hidden>→</span>
+          </a>
+        ) : null}
 
         {youtubeEmbedUrl ? (
           <div className="mt-6 aspect-video w-full overflow-hidden rounded-md border border-rule bg-ink/5">
