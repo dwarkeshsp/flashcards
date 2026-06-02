@@ -10,8 +10,6 @@ import { stephenKotkin } from "./stephen-kotkin";
 import { pretraining } from "./pretraining";
 import { transistors } from "./transistors";
 import { chips } from "./chips";
-import { vitalQuestion } from "./vital-question";
-import { stalin } from "./stalin";
 
 // Blackboard-lecture episodes (have a guest, video, transcript).
 export const siteLectures: Episode[] = [ericJang, reinerPope];
@@ -22,8 +20,6 @@ export const siteSubjects: Episode[] = [
   pretraining,
   transistors,
   chips,
-  vitalQuestion,
-  stalin,
 ];
 
 // Everything that statically renders to the public site.
