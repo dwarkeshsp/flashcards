@@ -121,6 +121,7 @@ export function EpisodeHeader({ episode }: { episode: Episode }) {
           {cards > 0 ? (
             <>
               <ExportLink href={`/exports/${slug}/flashcards.apkg`} label="Anki deck" />
+              <ExportLink href={`/exports/${slug}/flashcards.mochi.md`} label="Mochi" />
               <ExportLink href={`/exports/${slug}/flashcards.md`} label="Markdown" />
             </>
           ) : null}

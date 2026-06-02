@@ -119,6 +119,38 @@ function buildJson(ep: Episode): string {
   );
 }
 
+// Mochi (mochi.cards) renders math with KaTeX using `$...$` (inline)
+// and `$$...$$` (block) — the exact delimiters our source markdown
+// already uses. So unlike the Anki export, we DON'T rewrite them to
+// `\(...\)` / `\[...\]`; we just leave the markdown alone and point
+// image references at bare filenames so Mochi's attachment picker can
+// resolve them at import time.
+//
+// Output is a single Markdown file per deck, split into one card per
+// `%%` line. Inside each card, a `---` line separates the front
+// (question) from the back (answer) — Mochi's two-sided card syntax.
+//
+// To import: Mochi → Import → Markdown → single file, and set the card
+// delimiter to `%%`.
+function mdToMochi(s: string): string {
+  return s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
+    const filename = String(src).split("/").pop() ?? src;
+    return `![${alt}](${filename})`;
+  });
+}
+
+function buildMochiMd(ep: Episode): string {
+  const cards: string[] = [];
+  for (const s of ep.sections) {
+    for (const c of s.cards) {
+      const q = mdToMochi(c.q).trim();
+      const a = mdToMochi(c.a).trim();
+      cards.push(`${q}\n\n---\n\n${a}`);
+    }
+  }
+  return cards.join("\n\n%%\n\n") + "\n";
+}
+
 function applyTranscriptFixes(ep: Episode): string | null {
   if (!ep.transcriptPath) return null;
   const full = join(ROOT, ep.transcriptPath);
@@ -146,7 +178,8 @@ function exportEpisode(ep: Episode) {
     writeFileSync(join(out, "flashcards.md"), buildFlashcardsMd(ep), "utf8");
     writeFileSync(join(out, "flashcards.tsv"), buildTsv(ep), "utf8");
     writeFileSync(join(out, "flashcards.json"), buildJson(ep), "utf8");
-    console.log(`    ✓ flashcards.{md,tsv,json}`);
+    writeFileSync(join(out, "flashcards.mochi.md"), buildMochiMd(ep), "utf8");
+    console.log(`    ✓ flashcards.{md,tsv,json,mochi.md}`);
   }
 
   const transcript = applyTranscriptFixes(ep);
