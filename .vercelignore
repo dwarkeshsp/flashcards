@@ -12,3 +12,9 @@ public/exports/*
 !public/exports/reiner-pope/**
 !public/exports/eric-jang
 !public/exports/eric-jang/**
+!public/exports/pretraining
+!public/exports/pretraining/**
+!public/exports/transistors
+!public/exports/transistors/**
+!public/exports/chips
+!public/exports/chips/**
