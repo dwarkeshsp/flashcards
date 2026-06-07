@@ -57,9 +57,160 @@ function escapeAnkiField(s: string): string {
   return s.replace(/\t/g, " ").replace(/\r?\n/g, "<br>").replace(/"/g, '""');
 }
 
+// Symbols that map cleanly to a single Unicode glyph (TeX command name
+// without the leading backslash → replacement).
+const TEX_SYMBOLS: Record<string, string> = {
+  approx: "≈", sim: "~", cdot: "·", times: "×", div: "÷", pm: "±", mp: "∓",
+  geq: "≥", ge: "≥", leq: "≤", le: "≤", ll: "≪", gg: "≫", neq: "≠", ne: "≠",
+  equiv: "≡", to: "→", rightarrow: "→", leftarrow: "←", mapsto: "↦",
+  Rightarrow: "⇒", propto: "∝", in: "∈", notin: "∉", subset: "⊂", mid: "|",
+  cup: "∪", cap: "∩", sum: "∑", prod: "∏", int: "∫", infty: "∞",
+  partial: "∂", nabla: "∇", dots: "…", ldots: "…", cdots: "…",
+  pi: "π", theta: "θ", mu: "μ", sigma: "σ", Sigma: "Σ", lambda: "λ",
+  Lambda: "Λ", alpha: "α", beta: "β", gamma: "γ", Gamma: "Γ", delta: "δ",
+  Delta: "Δ", epsilon: "ε", phi: "φ", rho: "ρ", tau: "τ", omega: "ω",
+  Omega: "Ω", top: "T",
+  // escaped literals (e.g. `\{` `\}` `\%`) -> placeholders restored later
+  "{": "\u0001", "}": "\u0002", "%": "%", $: "$", "&": "&", "#": "#",
+  "|": "|", " ": " ",
+};
+
+const SUPERSCRIPT: Record<string, string> = {
+  "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶",
+  "7": "⁷", "8": "⁸", "9": "⁹", "+": "⁺", "-": "⁻", "=": "⁼", "(": "⁽",
+  ")": "⁾", n: "ⁿ", i: "ⁱ",
+};
+
+function toSuper(arg: string): string {
+  if (arg.length > 0 && [...arg].every((c) => SUPERSCRIPT[c])) {
+    return [...arg].map((c) => SUPERSCRIPT[c]).join("");
+  }
+  return arg.length === 1 ? `^${arg}` : `^(${arg})`;
+}
+
+function readBraced(s: string, i: number): { body: string; end: number } {
+  // s[i] must be '{'
+  let depth = 0;
+  for (let j = i; j < s.length; j++) {
+    if (s[j] === "{") depth++;
+    else if (s[j] === "}") {
+      depth--;
+      if (depth === 0) return { body: s.slice(i + 1, j), end: j + 1 };
+    }
+  }
+  return { body: s.slice(i + 1), end: s.length };
+}
+
+function readArg(s: string, i: number): { body: string; end: number } {
+  while (s[i] === " ") i++;
+  if (s[i] === "{") return readBraced(s, i);
+  if (s[i] === "\\") {
+    const m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i));
+    if (m) return { body: m[0], end: i + m[0].length };
+  }
+  return { body: s[i] ?? "", end: i + 1 };
+}
+
+// Render a TeX math string as readable plain text with Unicode glyphs.
+// Used only for the exported cards (Anki/Mochi); the website keeps KaTeX.
+function mathToText(tex: string): string {
+  const fracLike = new Set(["frac", "dfrac", "tfrac"]);
+  const stripCmds = new Set([
+    "text", "mathrm", "mathcal", "mathbb", "mathbf", "mathit", "boldsymbol",
+    "textbf", "textit", "operatorname",
+  ]);
+  const dropCmds = new Set([
+    "left", "right", "bigl", "bigr", "Bigl", "Bigr", "big", "Big", "biggl",
+    "biggr", "bigm", "Bigm", "displaystyle", "limits",
+  ]);
+
+  function convert(s: string): string {
+    let out = "";
+    let i = 0;
+    while (i < s.length) {
+      const ch = s[i];
+      if (ch === "\\") {
+        const m = /^\\([a-zA-Z]+|.)/.exec(s.slice(i));
+        if (!m) { out += ch; i++; continue; }
+        const cmd = m[1];
+        i += m[0].length;
+        if (fracLike.has(cmd)) {
+          const a = readArg(s, i); i = a.end;
+          const b = readArg(s, i); i = b.end;
+          const num = convert(a.body), den = convert(b.body);
+          const simple = (x: string) => /^[A-Za-z0-9.]+$/.test(x);
+          out += simple(num) && simple(den) ? `${num}/${den}` : `(${num})/(${den})`;
+        } else if (cmd === "sqrt") {
+          const a = readArg(s, i); i = a.end;
+          out += `√(${convert(a.body)})`;
+        } else if (cmd === "underbrace") {
+          const a = readArg(s, i); i = a.end;
+          let label = "";
+          while (s[i] === " ") i++;
+          if (s[i] === "_") { i++; const l = readArg(s, i); i = l.end; label = convert(l.body); }
+          out += convert(a.body) + (label ? ` [${label}]` : "");
+        } else if (stripCmds.has(cmd)) {
+          const a = readArg(s, i); i = a.end;
+          out += convert(a.body);
+        } else if (dropCmds.has(cmd)) {
+          // drop sizing/style commands, keep following delimiter char
+        } else if (TEX_SYMBOLS[cmd] !== undefined) {
+          out += TEX_SYMBOLS[cmd];
+        } else if (cmd === "\\") {
+          out += " ";
+        } else if ([",", ";", ":", " "].includes(cmd)) {
+          out += " ";
+        } else if (cmd === "!") {
+          // negative thin space -> nothing
+        } else {
+          // unknown command. Named operators (log, max, arg, ...) read
+          // better with a leading space; everything else is kept verbatim.
+          const OPERATORS = new Set([
+            "max", "min", "arg", "log", "ln", "exp", "det", "sin", "cos",
+            "tan", "lim", "sup", "inf", "gcd", "dim", "deg",
+          ]);
+          if (OPERATORS.has(cmd) && out.length && !/[\s(]$/.test(out)) out += " ";
+          out += cmd;
+        }
+      } else if (ch === "{" || ch === "}") {
+        i++; // drop grouping braces
+      } else if (ch === "^") {
+        i++;
+        const a = readArg(s, i); i = a.end;
+        out += toSuper(convert(a.body));
+      } else if (ch === "_") {
+        i++;
+        const a = readArg(s, i); i = a.end;
+        out += `_${convert(a.body)}`;
+      } else {
+        out += ch; i++;
+      }
+    }
+    return out;
+  }
+
+  let t = convert(tex.replace(/~/g, " "));
+  t = t.replace(/\u0001/g, "{").replace(/\u0002/g, "}");
+  t = t.replace(/[ \t]{2,}/g, " ").trim();
+  return t;
+}
+
 function mdToAnkiHtml(s: string): string {
-  let out = s.replace(/\$\$([\s\S]+?)\$\$/g, (_m, x) => `\\[${x}\\]`);
-  out = out.replace(/\$([^\n$]+?)\$/g, (_m, x) => `\\(${x}\\)`);
+  // Math renders inconsistently across apps (Anki MathJax vs Mochi KaTeX vs
+  // their HTML→Markdown importer), so for the exported cards we render TeX to
+  // readable Unicode plain text. The website still gets real KaTeX because it
+  // reads the raw markdown source, not this export.
+  //
+  // Math spans are converted and stashed behind placeholders first so the
+  // bold/italic/code passes below can't mangle the result.
+  const math: string[] = [];
+  const stash = (tex: string) => {
+    math.push(mathToText(tex));
+    return `\u0000MATH${math.length - 1}\u0000`;
+  };
+  let out = s.replace(/\$\$([\s\S]+?)\$\$/g, (_m, x) => stash(x));
+  out = out.replace(/\$([^\n$]+?)\$/g, (_m, x) => stash(x));
+
   out = out.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<i>$2</i>");
   out = out.replace(/`([^`]+)`/g, "<code>$1</code>");
@@ -75,6 +226,8 @@ function mdToAnkiHtml(s: string): string {
     .split("\n")
     .map((l) => (/^\s*\d+\.\s+/.test(l) ? l.replace(/^\s*(\d+)\.\s+/, "$1. ") : l))
     .join("\n");
+
+  out = out.replace(/\u0000MATH(\d+)\u0000/g, (_m, i) => math[Number(i)]);
   return out.trim();
 }
 
@@ -119,38 +272,6 @@ function buildJson(ep: Episode): string {
   );
 }
 
-// Mochi (mochi.cards) renders math with KaTeX using `$...$` (inline)
-// and `$$...$$` (block) — the exact delimiters our source markdown
-// already uses. So unlike the Anki export, we DON'T rewrite them to
-// `\(...\)` / `\[...\]`; we just leave the markdown alone and point
-// image references at bare filenames so Mochi's attachment picker can
-// resolve them at import time.
-//
-// Output is a single Markdown file per deck, split into one card per
-// `%%` line. Inside each card, a `---` line separates the front
-// (question) from the back (answer) — Mochi's two-sided card syntax.
-//
-// To import: Mochi → Import → Markdown → single file, and set the card
-// delimiter to `%%`.
-function mdToMochi(s: string): string {
-  return s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_m, alt, src) => {
-    const filename = String(src).split("/").pop() ?? src;
-    return `![${alt}](${filename})`;
-  });
-}
-
-function buildMochiMd(ep: Episode): string {
-  const cards: string[] = [];
-  for (const s of ep.sections) {
-    for (const c of s.cards) {
-      const q = mdToMochi(c.q).trim();
-      const a = mdToMochi(c.a).trim();
-      cards.push(`${q}\n\n---\n\n${a}`);
-    }
-  }
-  return cards.join("\n\n%%\n\n") + "\n";
-}
-
 function applyTranscriptFixes(ep: Episode): string | null {
   if (!ep.transcriptPath) return null;
   const full = join(ROOT, ep.transcriptPath);
@@ -178,8 +299,7 @@ function exportEpisode(ep: Episode) {
     writeFileSync(join(out, "flashcards.md"), buildFlashcardsMd(ep), "utf8");
     writeFileSync(join(out, "flashcards.tsv"), buildTsv(ep), "utf8");
     writeFileSync(join(out, "flashcards.json"), buildJson(ep), "utf8");
-    writeFileSync(join(out, "flashcards.mochi.md"), buildMochiMd(ep), "utf8");
-    console.log(`    ✓ flashcards.{md,tsv,json,mochi.md}`);
+    console.log(`    ✓ flashcards.{md,tsv,json}`);
   }
 
   const transcript = applyTranscriptFixes(ep);

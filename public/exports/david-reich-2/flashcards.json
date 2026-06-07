@@ -18,13 +18,13 @@
           "question_md": "What concretely is the selection coefficient of an allele?",
           "answer_md": "How many more surviving offspring, in expectation, carriers of the allele will have.\n\nE.g. a selection coefficient $s = 0.01$ means $1\\%$ more surviving offspring than non-carriers.",
           "question_html": "What concretely is the selection coefficient of an allele?",
-          "answer_html": "How many more surviving offspring, in expectation, carriers of the allele will have.\n\nE.g. a selection coefficient \\(s = 0.01\\) means \\(1\\%\\) more surviving offspring than non-carriers."
+          "answer_html": "How many more surviving offspring, in expectation, carriers of the allele will have.\n\nE.g. a selection coefficient s = 0.01 means 1% more surviving offspring than non-carriers."
         },
         {
           "question_md": "Expected heterozygosity scales as what? (constant + two variables)",
           "answer_md": "$$H \\propto 4 \\cdot N_e \\cdot \\mu$$\n\nwhere $N_e$ is the effective population size and $\\mu$ is the mutation rate.",
           "question_html": "Expected heterozygosity scales as what? (constant + two variables)",
-          "answer_html": "\\[H \\propto 4 \\cdot N_e \\cdot \\mu\\]\n\nwhere \\(N_e\\) is the effective population size and \\(\\mu\\) is the mutation rate."
+          "answer_html": "H ∝ 4 · N_e · μ\n\nwhere N_e is the effective population size and μ is the mutation rate."
         },
         {
           "question_md": "What is effective population size, and why is it so much smaller than census population size?",
@@ -55,7 +55,7 @@
           "question_md": "Why do even neutral alleles get caught up in background selection? Why does the local level of drift go up?",
           "answer_md": "When a deleterious allele is eliminated, it takes along everything else on the same chromosome that's linked to it — including neutral variants nearby. That linked hitchhiking effectively reduces $N_e$ locally, which looks like extra drift.",
           "question_html": "Why do even neutral alleles get caught up in background selection? Why does the local level of drift go up?",
-          "answer_html": "When a deleterious allele is eliminated, it takes along everything else on the same chromosome that's linked to it — including neutral variants nearby. That linked hitchhiking effectively reduces \\(N_e\\) locally, which looks like extra drift."
+          "answer_html": "When a deleterious allele is eliminated, it takes along everything else on the same chromosome that's linked to it — including neutral variants nearby. That linked hitchhiking effectively reduces N_e locally, which looks like extra drift."
         },
         {
           "question_md": "What are two reasons that selective sweeps on specific loci might be rare despite the fact that selection for traits has continued?",
@@ -86,7 +86,7 @@
           "question_md": "Explain the methodology of Bhatia et al. 2014 to find selection effects of American slavery.",
           "answer_md": "- African Americans are $\\sim 20\\%$ European and $\\sim 80\\%$ West African (using the Yoruba population as a proxy for pre-admixture West African ancestry).\n- If a site has been under selection since admixture, the allele frequency in modern African Americans should deviate from the frequency predicted by that $20/80$ mixture.\n- They ran this scan on $29{,}141$ African Americans.",
           "question_html": "Explain the methodology of Bhatia et al. 2014 to find selection effects of American slavery.",
-          "answer_html": "• African Americans are \\(\\sim 20\\%\\) European and \\(\\sim 80\\%\\) West African (using the Yoruba population as a proxy for pre-admixture West African ancestry).\n• If a site has been under selection since admixture, the allele frequency in modern African Americans should deviate from the frequency predicted by that \\(20/80\\) mixture.\n• They ran this scan on \\(29{,}141\\) African Americans."
+          "answer_html": "• African Americans are ~ 20% European and ~ 80% West African (using the Yoruba population as a proxy for pre-admixture West African ancestry).\n• If a site has been under selection since admixture, the allele frequency in modern African Americans should deviate from the frequency predicted by that 20/80 mixture.\n• They ran this scan on 29,141 African Americans."
         },
         {
           "question_md": "What technique was used before Reich & Akbari to ask whether allele frequency changes over time resulted from selection vs. drift?",

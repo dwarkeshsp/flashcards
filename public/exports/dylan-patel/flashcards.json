@@ -31,7 +31,7 @@
           "question_md": "How can higher fixed compute costs push demand toward better (holding compute constant) AI models?",
           "answer_md": "It is an Alchian-Allen style effect. If two options both inherit the same fixed cost, the higher-quality option becomes cheaper in relative terms. A $2 model versus a $1 model is 2x as expensive; add a $1 compute cost to both, and it is $3 versus $2, only 1.5x. If users must pay a large compute bill anyway, paying a bit more for the best model can look more attractive.",
           "question_html": "How can higher fixed compute costs push demand toward better (holding compute constant) AI models?",
-          "answer_html": "It is an Alchian-Allen style effect. If two options both inherit the same fixed cost, the higher-quality option becomes cheaper in relative terms. A \\(2 model versus a \\)1 model is 2x as expensive; add a \\(1 compute cost to both, and it is \\)3 versus $2, only 1.5x. If users must pay a large compute bill anyway, paying a bit more for the best model can look more attractive."
+          "answer_html": "It is an Alchian-Allen style effect. If two options both inherit the same fixed cost, the higher-quality option becomes cheaper in relative terms. A 2 model versus a1 model is 2x as expensive; add a 1 compute cost to both, and it is3 versus $2, only 1.5x. If users must pay a large compute bill anyway, paying a bit more for the best model can look more attractive."
         }
       ]
     },
