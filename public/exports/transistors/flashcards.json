@@ -22,13 +22,13 @@
         {
           "question_md": "Does a diode act as a conductor or insulator when conventional current flows from $\\text{battery} \\to \\text{P} \\to \\text{N} \\to \\text{battery}$? Why?",
           "answer_md": "Insulator.\n\nElectrons saturate the holes in P, leaving no differential for the electrons in N to jump towards. Meanwhile, the extra electrons in N flow back to the battery.",
-          "question_html": "Does a diode act as a conductor or insulator when conventional current flows from battery → P → N → battery? Why?",
+          "question_html": "Does a diode act as a conductor or insulator when conventional current flows from \\(\\text{battery} \\to \\text{P} \\to \\text{N} \\to \\text{battery}\\)? Why?",
           "answer_html": "Insulator.\n\nElectrons saturate the holes in P, leaving no differential for the electrons in N to jump towards. Meanwhile, the extra electrons in N flow back to the battery."
         },
         {
           "question_md": "Does a diode act as a conductor or insulator when conventional current flows from $\\text{battery} \\to \\text{N} \\to \\text{P} \\to \\text{battery}$? Why?",
           "answer_md": "Conductor.\n\nElectrons saturate N, push into the depletion region, then jump across to the holes in P, which then return to the battery.",
-          "question_html": "Does a diode act as a conductor or insulator when conventional current flows from battery → N → P → battery? Why?",
+          "question_html": "Does a diode act as a conductor or insulator when conventional current flows from \\(\\text{battery} \\to \\text{N} \\to \\text{P} \\to \\text{battery}\\)? Why?",
           "answer_html": "Conductor.\n\nElectrons saturate N, push into the depletion region, then jump across to the holes in P, which then return to the battery."
         },
         {
