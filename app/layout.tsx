@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Dwarkesh Podcast Flashcards",
+  title: "Dwarkesh's Notebook",
   description:
-    "Flashcards for blackboard lectures of the Dwarkesh Podcast.",
+    "Notes and highlights from what Dwarkesh is reading, plus flashcards for Dwarkesh Podcast episodes.",
   openGraph: {
-    title: "Dwarkesh Podcast Flashcards",
+    title: "Dwarkesh's Notebook",
     description:
-      "Flashcards for blackboard lectures of the Dwarkesh Podcast.",
+      "Notes and highlights from what Dwarkesh is reading, plus flashcards for Dwarkesh Podcast episodes.",
     type: "website",
   },
 };
