@@ -1,0 +1,32 @@
+{
+  "source": "readwise",
+  "readwiseBookId": 61843811,
+  "title": "The Vertigo Years",
+  "author": "Philipp Blom",
+  "exportedAt": "2026-07-04T17:05:49.951Z",
+  "highlights": [
+    {
+      "id": 1031510211,
+      "text": "By 1905, Britain was importing 60 per cent of its basic foodstuffs and 80 per cent of its grain. The global market had become a reality: not just its benefits, which had long been clear to the British, the world’s pre-eminent producers and salesmen for a century or more, but now its disadvantages. For the British landed classes, this development was devastating. A domestic market that had for so long been certain, protected by geographical barriers and unchallenged by other producers, had melted away within little more than a decade, and its profits too. Land as the power base of the aristocracy had been all but destroyed. By 1900, some 14,000 estates had been mortgaged, with only 2,800 of their owners managing to keep up their repayments. Between 1903 and 1909 alone, Britain’s aristocrats sold 9 million acres of land.",
+      "note": "Just as the steam ships were bad for aristocrats, so too ai",
+      "location": 716,
+      "locationType": "location",
+      "highlightedAt": "2026-06-20T04:56:00Z"
+    },
+    {
+      "id": 1031510212,
+      "text": "A vast proportion of British investments went into lucrative new enterprises abroad, particularly in the United States, South America and Russia, thereby unwittingly helping the competition to build up an efficient and modern agricultural and industrial base while factories in Britain still operated with the mid-Victorian machinery that had once made the country great, but was obsolete now and unable to keep up with the rising pace of technological development on the international market.",
+      "note": "Even more similar to fueling the machine only economy",
+      "location": 723,
+      "locationType": "location",
+      "highlightedAt": "2026-06-20T04:56:00Z"
+    },
+    {
+      "id": 1031510213,
+      "text": "The few aristocrats flexible enough to try new methods of cultivation, new machines and new crops almost always failed when confronted with the sheer ignorance and stubbornness of their own former serfs, conservative to the core, who preferred to sabotage new methods and destroy machines rather than accept the slightest change, as the enthusiastic modernizer Levin finds to his cost in Tolstoy’s 1877 Anna Karenina.",
+      "location": 771,
+      "locationType": "location",
+      "highlightedAt": "2026-06-20T04:56:00Z"
+    }
+  ]
+}
