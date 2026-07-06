@@ -133,7 +133,7 @@ def build_deck(data_file: Path, model: genanki.Model) -> tuple[Path, int, int]:
         for card in sec["cards"]:
             q_html = card["question_html"]
             a_html = card["answer_html"]
-            for src in find_referenced_images(a_html):
+            for src in find_referenced_images(q_html + a_html):
                 fname = Path(src).name
                 # Look in public/images/<slug>/ first (per-episode generated
                 # assets), then fall back to public/images/ (shared assets).

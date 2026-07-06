@@ -75,6 +75,9 @@ function mdToAnkiHtml(s: string): string {
     .split("\n")
     .map((l) => (/^\s*\d+\.\s+/.test(l) ? l.replace(/^\s*(\d+)\.\s+/, "$1. ") : l))
     .join("\n");
+  // Drop markdown escapes like `1\.` (used to suppress ordered-list
+  // parsing on the site); Anki HTML should show a plain period.
+  out = out.replace(/\\\./g, ".");
   return out.trim();
 }
 

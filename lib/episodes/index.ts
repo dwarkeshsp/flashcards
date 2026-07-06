@@ -8,8 +8,7 @@ import { jacobKimmel } from "./jacob-kimmel";
 import { lewisBollard } from "./lewis-bollard";
 import { stephenKotkin } from "./stephen-kotkin";
 import { pretraining } from "./pretraining";
-import { transistors } from "./transistors";
-import { chips } from "./chips";
+import { silicon } from "./silicon";
 
 // Blackboard-lecture episodes (have a guest, video, transcript).
 export const siteLectures: Episode[] = [ericJang, reinerPope];
@@ -18,8 +17,7 @@ export const siteLectures: Episode[] = [ericJang, reinerPope];
 // separate section beneath the lectures on the home page.
 export const siteSubjects: Episode[] = [
   pretraining,
-  transistors,
-  chips,
+  silicon,
 ];
 
 // Everything that statically renders to the public site.
