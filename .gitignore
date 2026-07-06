@@ -10,3 +10,4 @@ extracted_docx
 .agent-venv
 tsconfig.tsbuildinfo
 scripts/__pycache__/
+.env*
