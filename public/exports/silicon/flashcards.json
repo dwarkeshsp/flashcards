@@ -89,31 +89,6 @@
       ]
     },
     {
-      "id": "dennard-scaling",
-      "timestamp": null,
-      "title": "Dennard scaling",
-      "cards": [
-        {
-          "question_md": "What is Dennard scaling?",
-          "answer_md": "As transistors shrink, their power density stays constant, so total power usage stays in proportion with chip area.",
-          "question_html": "What is Dennard scaling?",
-          "answer_html": "As transistors shrink, their power density stays constant, so total power usage stays in proportion with chip area."
-        },
-        {
-          "question_md": "How did MOSFETs enable Dennard scaling?",
-          "answer_md": "If you shrink both the voltage and the oxide thickness, the transistor keeps working the same way.",
-          "question_html": "How did MOSFETs enable Dennard scaling?",
-          "answer_html": "If you shrink both the voltage and the oxide thickness, the transistor keeps working the same way."
-        },
-        {
-          "question_md": "What was Dennard scaling and why did it come to an end?",
-          "answer_md": "Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.\n\nHowever, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on.",
-          "question_html": "What was Dennard scaling and why did it come to an end?",
-          "answer_html": "Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.\n\nHowever, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on."
-        }
-      ]
-    },
-    {
       "id": "since-1947",
       "timestamp": null,
       "title": "Since 1947",
@@ -123,6 +98,12 @@
           "answer_md": "Its native oxide (GeO₂) is water-soluble and electrically defective. MOSFETs need a thin, stable, near-perfect insulator on the channel — only silicon grows one (SiO₂).",
           "question_html": "The original 1947 transistor was made of germanium, which also has 4 valence electrons like silicon. Why can't germanium be used to build MOSFETs?",
           "answer_html": "Its native oxide (GeO₂) is water-soluble and electrically defective. MOSFETs need a thin, stable, near-perfect insulator on the channel — only silicon grows one (SiO₂)."
+        },
+        {
+          "question_md": "What was Dennard scaling and why did it come to an end?",
+          "answer_md": "Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.\n\nHowever, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on.",
+          "question_html": "What was Dennard scaling and why did it come to an end?",
+          "answer_html": "Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.\n\nHowever, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on."
         },
         {
           "question_md": "At a high level, what is the difference between planar, FinFET, and gate-all-around?",

@@ -109,18 +109,12 @@ Top to bottom: gate (metal) on top of an SiO₂ insulator, sitting on a P-type s
 
 ---
 
-# Section: Dennard scaling
-id: dennard-scaling
+# Section: Since 1947
+id: since-1947
 
-## Q: What is Dennard scaling?
+## Q: The original 1947 transistor was made of germanium, which also has 4 valence electrons like silicon. Why can't germanium be used to build MOSFETs?
 
-### A: As transistors shrink, their power density stays constant, so total power usage stays in proportion with chip area.
-
----
-
-## Q: How did MOSFETs enable Dennard scaling?
-
-### A: If you shrink both the voltage and the oxide thickness, the transistor keeps working the same way.
+### A: Its native oxide (GeO₂) is water-soluble and electrically defective. MOSFETs need a thin, stable, near-perfect insulator on the channel — only silicon grows one (SiO₂).
 
 ---
 
@@ -131,15 +125,6 @@ id: dennard-scaling
 Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.
 
 However, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on.
-
----
-
-# Section: Since 1947
-id: since-1947
-
-## Q: The original 1947 transistor was made of germanium, which also has 4 valence electrons like silicon. Why can't germanium be used to build MOSFETs?
-
-### A: Its native oxide (GeO₂) is water-soluble and electrically defective. MOSFETs need a thin, stable, near-perfect insulator on the channel — only silicon grows one (SiO₂).
 
 ---
 

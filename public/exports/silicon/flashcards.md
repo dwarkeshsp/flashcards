@@ -1,6 +1,6 @@
 # Silicon
 
-- Total cards: 37
+- Total cards: 35
 
 Transistors, chip design, and fabrication — diodes to MOSFETs, MACs to RTL-to-GDS, and STI to high-NA EUV.
 
@@ -68,35 +68,25 @@ When you turn the transistor on or off (i.e. when the gate voltage changes).
 
 A capacitor.
 
-## Dennard scaling
-
-### Q1. What is Dennard scaling?
-
-As transistors shrink, their power density stays constant, so total power usage stays in proportion with chip area.
-
-### Q2. How did MOSFETs enable Dennard scaling?
-
-If you shrink both the voltage and the oxide thickness, the transistor keeps working the same way.
-
-### Q3. What was Dennard scaling and why did it come to an end?
-
-Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.
-
-However, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on.
-
 ## Since 1947
 
 ### Q1. The original 1947 transistor was made of germanium, which also has 4 valence electrons like silicon. Why can't germanium be used to build MOSFETs?
 
 Its native oxide (GeO₂) is water-soluble and electrically defective. MOSFETs need a thin, stable, near-perfect insulator on the channel — only silicon grows one (SiO₂).
 
-### Q2. At a high level, what is the difference between planar, FinFET, and gate-all-around?
+### Q2. What was Dennard scaling and why did it come to an end?
+
+Dennard scaling refers to the period from 1960-2005 in which planar MOSFETs were scaled down by directly shrinking their dimensions, which increased power density.
+
+However, threshold voltage and leakage current do not scale with transistor length - Source and Drain got so close together that they would be current even without the channel being on.
+
+### Q3. At a high level, what is the difference between planar, FinFET, and gate-all-around?
 
 - Planar: gate sits flat atop the source-to-drain channel.
 - FinFET: gate drapes the channel from three sides.
 - Gate-all-around: gate fully wraps the channel from all sides.
 
-### Q3. MOSFET technology has progressed from planar (1965–2011) to FinFET (2011–2022) to gate-all-around (2022 onwards). Why?
+### Q4. MOSFET technology has progressed from planar (1965–2011) to FinFET (2011–2022) to gate-all-around (2022 onwards). Why?
 
 Better gate control means you can shrink the source-to-drain distance (the "gate length") without source/drain fields leaking current through.
 
