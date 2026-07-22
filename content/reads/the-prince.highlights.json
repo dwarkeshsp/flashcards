@@ -1,0 +1,16 @@
+{
+  "source": "readwise",
+  "readwiseBookId": 61843839,
+  "title": "The Prince",
+  "author": "Niccolo Machiavelli and W. K. Marriott",
+  "exportedAt": "2026-07-04T17:05:49.951Z",
+  "highlights": [
+    {
+      "id": 1031510461,
+      "text": "for men change their rulers willingly, hoping to better themselves, and this hope induces them to take up arms against him who rules: wherein they are deceived, because they afterwards find by experience they have gone from bad to worse.",
+      "location": 273,
+      "locationType": "location",
+      "highlightedAt": "2026-06-02T04:56:00Z"
+    }
+  ]
+}

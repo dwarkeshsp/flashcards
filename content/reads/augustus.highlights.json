@@ -1,0 +1,30 @@
+{
+  "source": "readwise",
+  "readwiseBookId": 61843835,
+  "title": "Augustus",
+  "author": "John Williams",
+  "exportedAt": "2026-07-04T17:05:49.950Z",
+  "highlights": [
+    {
+      "id": 1031510454,
+      "text": "“Well, our comedy is almost over,” he said. “But there can be much sadness in a comedy.”",
+      "location": 3989,
+      "locationType": "location",
+      "highlightedAt": "2026-06-11T04:56:00Z"
+    },
+    {
+      "id": 1031510455,
+      "text": "One does not deceive oneself about the consequences of one’s acts; one deceives oneself about the ease with which one can live with those consequences.",
+      "location": 4530,
+      "locationType": "location",
+      "highlightedAt": "2026-06-11T04:56:00Z"
+    },
+    {
+      "id": 1031510456,
+      "text": "For sometimes in my sleep there parade before me the tens of thousands of bodies that will not walk again upon the earth, men no less innocent than those ancient victims whose deaths propitiated an earlier god; and it seems to me then, in the obscurity or clarity of the dream, that I am that priest who has emerged from the dark past of our race to speak the rite that causes the knife to fall. We tell ourselves that we have become a civilized race, and with a pious horror we speak of those times when a god of the crops demanded the body of a human being for his obscure function. But is not the god that so many Romans have served, in our memory and even in our time, as dark and fearsome as that ancient one? Even if to destroy him, I have been his priest; and even if to weaken his power, I have done his bidding. Yet I have not destroyed him, or weakened his power. He sleeps restlessly in the hearts of men, waiting to rouse himself or to be aroused. Between the brutality that would sacrifice a single innocent life to a fear without a name, and the enlightenment that would sacrifice thousands of lives to a fear that we have named, I have found little to choose.",
+      "location": 4561,
+      "locationType": "location",
+      "highlightedAt": "2026-06-11T04:56:00Z"
+    }
+  ]
+}

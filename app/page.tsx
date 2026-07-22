@@ -1,16 +1,22 @@
 import Link from "next/link";
-import { siteLectures, siteSubjects } from "@/lib/episodes";
+import { siteEpisodes } from "@/lib/episodes";
 import { Episode, totalCardCount } from "@/lib/types";
-import { ArrowIcon } from "@/components/Icons";
+import { getAllReads } from "@/lib/reads";
+import { ReadList } from "@/components/ReadList";
 import { Footer } from "@/components/Footer";
 
 export default function Page() {
+  const reads = getAllReads();
   return (
     <div className="min-h-screen bg-paper">
-      <main className="mx-auto max-w-3xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
+      <main className="mx-auto max-w-2xl px-5 pt-16 pb-20 sm:px-8 sm:pt-24 sm:pb-28">
         <header className="mb-14">
-          <h1 className="max-w-prose text-[1.5rem] leading-snug tracking-tight text-ink sm:text-[1.75rem]">
-            Flashcards for the{" "}
+          <h1 className="text-[1.5rem] leading-snug tracking-tight text-ink sm:text-[1.75rem]">
+            Dwarkesh&apos;s notebook.
+          </h1>
+          <p className="mt-3 max-w-prose text-[0.95rem] leading-relaxed text-ink-muted">
+            Notes and highlights from what I&apos;m reading, and flashcards
+            for{" "}
             <a
               href="https://www.youtube.com/@DwarkeshPatel"
               target="_blank"
@@ -18,19 +24,30 @@ export default function Page() {
               className="underline decoration-rule decoration-1 underline-offset-[4px] transition-colors hover:text-accent hover:decoration-accent"
             >
               Dwarkesh Podcast
-            </a>
-            .
-          </h1>
+            </a>{" "}
+            episodes.
+          </p>
         </header>
 
-        <DeckSection label="Blackboard lectures" decks={siteLectures} />
-        {siteSubjects.length > 0 ? (
-          <DeckSection
-            label="Blog posts & side projects"
-            decks={siteSubjects}
-            className="mt-14"
-          />
-        ) : null}
+        <section>
+          <h2 className="mb-2 border-b border-rule pb-3 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+            <Link href="/reads/" className="transition-colors hover:text-accent">
+              Reads
+            </Link>
+          </h2>
+          <ReadList reads={reads} />
+        </section>
+
+        <section className="mt-16">
+          <h2 className="mb-2 border-b border-rule pb-3 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-ink-faint">
+            Flashcards
+          </h2>
+          <ul>
+            {siteEpisodes.map((ep) => (
+              <DeckRow key={ep.slug} ep={ep} />
+            ))}
+          </ul>
+        </section>
 
         <Footer className="mt-20" />
       </main>
@@ -38,93 +55,27 @@ export default function Page() {
   );
 }
 
-function DeckSection({
-  label,
-  decks,
-  className = "",
-}: {
-  label: string;
-  decks: Episode[];
-  className?: string;
-}) {
-  return (
-    <section className={className}>
-      <h2 className="mb-5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-ink-faint">
-        {label}
-      </h2>
-      <ul className="space-y-3">
-        {decks.map((ep) => (
-          <DeckCard key={ep.slug} ep={ep} />
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function DeckCard({ ep }: { ep: Episode }) {
+function DeckRow({ ep }: { ep: Episode }) {
   const cards = totalCardCount(ep);
-  const upcoming = !ep.youtubeUrl && !ep.date && (ep.kind ?? "lecture") === "lecture";
   const heading = ep.guest ?? ep.title;
   return (
-    <li>
+    <li className="border-t border-rule first:border-t-0">
       <Link
         href={`/${ep.slug}/`}
-        className="group block rounded-lg border border-rule bg-white/40 px-6 py-6 transition-all duration-150 hover:-translate-y-0.5 hover:border-ink/25 hover:bg-white hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] sm:px-7 sm:py-7"
+        className="group flex items-baseline justify-between gap-6 py-4"
       >
-        <div className="flex items-start justify-between gap-5">
-          <div className="min-w-0 flex-1">
-            <h3 className="font-serif text-[1.65rem] font-medium leading-tight tracking-tight text-ink transition-colors group-hover:text-accent sm:text-[1.85rem]">
-              {heading}
-            </h3>
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.825rem] text-ink-faint">
-              {ep.date ? (
-                <span className="tabular-nums">{formatDate(ep.date)}</span>
-              ) : null}
-              {ep.date ? <span aria-hidden>·</span> : null}
-              <span className="tabular-nums">
-                {cards} card{cards === 1 ? "" : "s"}
-              </span>
-              {upcoming ? (
-                <>
-                  <span aria-hidden>·</span>
-                  <span className="text-accent">Upcoming</span>
-                </>
-              ) : null}
-            </div>
-            <p className="mt-3 max-w-prose text-[0.975rem] leading-relaxed text-ink-muted">
-              {ep.blurb}
-            </p>
-          </div>
-          <span
-            aria-hidden
-            className="mt-1.5 shrink-0 text-ink-faint transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-accent"
-          >
-            <ArrowIcon />
+        <span className="min-w-0">
+          <span className="font-serif text-[1.15rem] font-medium leading-snug text-ink transition-colors group-hover:text-accent">
+            {heading}
           </span>
-        </div>
+          <span className="mt-1 block max-w-prose text-[0.9rem] leading-relaxed text-ink-muted">
+            {ep.blurb}
+          </span>
+        </span>
+        <span className="shrink-0 text-[0.8rem] tabular-nums text-ink-faint">
+          {cards} cards
+        </span>
       </Link>
     </li>
   );
-}
-
-function formatDate(iso: string): string {
-  // Handles "YYYY-MM" and "YYYY-MM-DD"
-  const parts = iso.split("-");
-  const year = parseInt(parts[0], 10);
-  const month = parseInt(parts[1] ?? "1", 10);
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  return `${monthNames[month - 1]} ${year}`;
 }

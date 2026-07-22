@@ -1,0 +1,33 @@
+{
+  "source": "readwise",
+  "readwiseBookId": 61843809,
+  "title": "An Empire of Wealth",
+  "author": "John Steele Gordon",
+  "exportedAt": "2026-07-04T17:05:49.949Z",
+  "highlights": [
+    {
+      "id": 1031510207,
+      "text": "Numerous attempts were made to find an export that would pay the bills and generate a profit to the stockholders. Because glass was increasingly in demand in England, but the wood needed for fuel in its production was increasingly scarce, the company tried exploiting Virginia’s endless forest and abundant sand, but could not ship it profitably across the Atlantic. Iron, pitch and tar, clapboards, and sassafras likewise did not yield anything like enough revenue.",
+      "note": "Disunion is so slow that it is this hard to monetize a whole new fucking continent",
+      "location": 346,
+      "locationType": "location",
+      "highlightedAt": "2026-06-28T04:56:00Z"
+    },
+    {
+      "id": 1031510208,
+      "text": "In the South, manumission became fashionable, and many planters, George Washington among them, freed their slaves upon their own deaths. The Constitutional Convention, in 1787, found it necessary, in order to reach agreement, not only to forbid outlawing the slave trade prior to 1808, but to make that clause unamendable. But by 1808 public opinion, even in the South, had swung so against the trade that Congress abolished it as soon as it legally could do so, on January 1 of that year. (Abolishing the slave trade and actually suppressing it, of course, were two different matters. It would be the primary task of the navy for most of the next fifty years.) The price of slaves had been declining through most of the late eighteenth century. Cotton changed all that. After 1793 the price of a slave ratcheted upward. A slave who would have sold for $300 before the cotton gin was selling for $2,000 and more by 1860. The slave holders, possessed of an increasingly valuable asset, were less and less inclined to part with what became, in the early decades of the nineteenth century, an enormous capital investment. Even the parts of the South outside the cotton-growing area became deeply involved economically with continuing what came to be called the South’s “peculiar institution.”",
+      "note": "1. I didn’t realize slavery had a resurgence and might have been on its way out even earlier if not for cotton gin 2. Like what’s gonna to compute",
+      "location": 1369,
+      "locationType": "location",
+      "highlightedAt": "2026-06-28T04:56:00Z"
+    },
+    {
+      "id": 1031510209,
+      "text": "But the industrialization of the British cloth industry in recent decades had given Britain an insuperable competitive advantage, and Britain was determined to keep it. The export of textile machinery was strictly forbidden. If the United States was to develop a textile industry of its own, therefore, it had only two choices. It could reinvent what was then high technology on its own, or it could steal it. The former was not very likely as the United States then lacked people familiar with the intricacies of textile manufacture. So it had to be stolen. Although British newspapers were forbidden to print them, clandestine advertisements—a sort of early capitalist samizdat—circulated by hand in the textile areas of the Midlands, offering big rewards to anyone willing and able to set up working textile machinery in the United States.",
+      "note": "To Brian potters point that us versus china today is similar",
+      "location": 1421,
+      "locationType": "location",
+      "highlightedAt": "2026-06-28T04:56:00Z"
+    }
+  ]
+}

@@ -8,11 +8,13 @@
     "start": "next start",
     "pipeline": "tsx scripts/pipeline/run.ts",
     "export-files": "tsx scripts/export-files.ts",
+    "import-readwise": "tsx scripts/import-readwise.ts",
     "build-anki": "python3 scripts/build_anki.py",
     "build-cards": "npm run export-files && npm run build-anki"
   },
   "dependencies": {
     "@cursor/sdk": "^1.0.12",
+    "gray-matter": "^4.0.3",
     "katex": "0.16.11",
     "next": "14.2.15",
     "react": "18.3.1",
