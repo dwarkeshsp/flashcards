@@ -60,7 +60,7 @@ where $B$ is batch size, $N_{\text{active}}$ is active parameters, and FLOPs is 
 
 ## Q: Where does the lower bound on latency come from? Why can't you just keep decreasing batch size and have infinitesimal total time to process a token?
 
-### A: Because you still have to load all the active parameters into memory.
+### A: Because you still have to load all the **total** parameters into memory — the full weights get fetched every forward pass regardless of batch size. (Active parameters only determine compute time.)
 
 ---
 

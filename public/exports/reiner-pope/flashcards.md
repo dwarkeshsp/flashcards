@@ -30,7 +30,7 @@ $$t_{\text{mem}} = \frac{N_{\text{total}} + B \cdot \text{len}_{\text{ctx}} \cdo
 
 ### Q5. Where does the lower bound on latency come from? Why can't you just keep decreasing batch size and have infinitesimal total time to process a token?
 
-Because you still have to load all the active parameters into memory.
+Because you still have to load all the **total** parameters into memory — the full weights get fetched every forward pass regardless of batch size. (Active parameters only determine compute time.)
 
 ### Q6. Why doesn't the time cost of a token keep decreasing indefinitely as you increase batch size? What two things cannot be amortized over the batch?
 
