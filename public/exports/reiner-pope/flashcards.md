@@ -148,7 +148,9 @@ Above this point, you're memory time bound, thanks to KV cache growing, and so m
 
 ### Q3. Given Gemini's 200K crossover, work out the implied bytes-per-token of KV cache. Assume 100B active parameters.
 
-At the crossover, $t_{\text{compute}} = t_{\text{KV fetch}}$:
+Assume batch size is large enough that weight-fetch time is negligible — the weight fetch amortizes over the batch ($N_{\text{total}} / B$ per token), while compute and KV fetch per token don't shrink with $B$.
+
+Then at the crossover, $t_{\text{compute}} = t_{\text{KV fetch}}$:
 
 $$\frac{B \cdot N_{\text{active}}}{\text{FLOPs}} = \frac{B \cdot \text{len}_{\text{ctx}} \cdot \text{bytes/token}}{\text{mem\_bw}}$$
 
